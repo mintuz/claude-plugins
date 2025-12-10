@@ -8,6 +8,8 @@
 /plugin install web-tdd@mintuz-claude-plugins
 /plugin install productivity@mintuz-claude-plugins
 /plugin install product-management@mintuz-claude-plugins
+/plugin install system-design@mintuz-claude-plugins
+/plugin install web-design@mintuz-claude-plugins
 ```
 
 # What’s Included
@@ -31,6 +33,7 @@
 - `css-best-practices`: Knowledge base for maintainable CSS (SRP, immutable utilities, spacing rules, naming, accessibility-friendly defaults). Use when writing or refactoring styles.
 - `typescript-best-practices`: Knowledge base for strict, schema-first TypeScript (runtime validation with schemas, functional patterns, boundary typing, anti-`any`). Use when designing types, APIs, or validation.
 - `tdd-best-practices`: Knowledge base for behavior-focused TDD (factories over shared setup, red/green discipline, refactor triggers, testing pyramids). Use whenever writing tests or adding new behavior.
+- `ui-essentials` (web-design): UI polish guide focused on hierarchy, spacing, restrained typography/color, and confident states for clean interfaces.
 
 # Credits
 
