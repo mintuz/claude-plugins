@@ -1,0 +1,13 @@
+{
+  "name": "web-tdd",
+  "version": "1.0.0",
+  "description": "Agents and skills that are specialised in writing Web Application TypeScript Tests using TDD",
+  "author": {
+    "name": "Adam Bulmer",
+    "email": "[email protected]",
+    "url": "https://github.com/mintuz"
+  },
+  "repository": "https://github.com/mintuz/claude-plugins",
+  "license": "MIT",
+  "keywords": ["typescript"]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "web-design",
+  "version": "1.0.0",
+  "description": "Agents and skills that are specialised in designing beautiful web applications",
+  "author": {
+    "name": "Adam Bulmer",
+    "email": "[email protected]",
+    "url": "https://github.com/mintuz"
+  },
+  "repository": "https://github.com/mintuz/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "web",
+    "design",
+    "ui",
+    "ux",
+    "css",
+    "html",
+    "javascript",
+    "typescript"
+  ]
+}

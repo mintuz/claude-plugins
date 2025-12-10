@@ -1,0 +1,50 @@
+{
+  "name": "mintuz-claude-plugins",
+  "owner": {
+    "name": "Adam Bulmer",
+    "email": "[email protected]",
+    "url": "https://github.com/mintuz"
+  },
+  "plugins": [
+    {
+      "name": "productivity",
+      "source": "./plugins/productivity",
+      "description": "Productivity Agents and skills to speed up your workflows."
+    },
+    {
+      "name": "typescript",
+      "source": "./plugins/typescript",
+      "description": "Agents and skills that are specialised in writing Web Application TypeScript"
+    },
+    {
+      "name": "css",
+      "source": "./plugins/css",
+      "description": "Agents and skills that are specialised in authoring Web Application CSS Styles"
+    },
+    {
+      "name": "web-tdd",
+      "source": "./plugins/web-tdd",
+      "description": "Agents and skills that are specialised in writing Web Application TypeScript Tests using TDD"
+    },
+    {
+      "name": "react",
+      "source": "./plugins/react",
+      "description": "Agents and skills that are specialised in writing Web Application using React"
+    },
+    {
+      "name": "system-design",
+      "source": "./plugins/system-design",
+      "description": "Agents and skills that are specialised in writing Web Application System Design"
+    },
+    {
+      "name": "product-management",
+      "source": "./plugins/product-management",
+      "description": "Agents and skills that are specialised in Product Management workflows"
+    },
+    {
+      "name": "web-design",
+      "source": "./plugins/web-design",
+      "description": "Agents and skills that are specialised in designing beautiful web applications"
+    }
+  ]
+}

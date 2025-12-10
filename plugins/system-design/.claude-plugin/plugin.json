@@ -1,0 +1,13 @@
+{
+  "name": "system-design",
+  "version": "1.2.0",
+  "description": "Agents and skills that are specialised in writing Web Applications",
+  "author": {
+    "name": "Adam Bulmer",
+    "email": "[email protected]",
+    "url": "https://github.com/mintuz"
+  },
+  "repository": "https://github.com/mintuz/claude-plugins",
+  "license": "MIT",
+  "keywords": ["system-design"]
+}
