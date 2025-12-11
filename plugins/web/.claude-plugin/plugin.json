@@ -1,7 +1,7 @@
 {
-  "name": "web-design",
-  "version": "1.0.0",
-  "description": "Agents and skills that are specialised in designing beautiful web applications",
+  "name": "web",
+  "version": "1.1.0",
+  "description": "Agents and skills that are specialised in building and maintaining web applications",
   "author": {
     "name": "Adam Bulmer",
     "email": "[email protected]",

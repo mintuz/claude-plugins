@@ -1,0 +1,12 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "description": "Core Agents and skills that aid software development workflows",
+  "author": {
+    "name": "Adam Bulmer",
+    "email": "[email protected]"
+  },
+  "repository": "https://github.com/mintuz/claude-plugins",
+  "license": "MIT",
+  "keywords": ["core", "software", "development", "workflows"]
+}

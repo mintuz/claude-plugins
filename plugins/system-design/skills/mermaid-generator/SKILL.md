@@ -1,54 +1,49 @@
 ---
-description: Generate a Mermaid diagram from code files and directories to visualize architecture, data flow, or component relationships.
+name: mermaid-generator
+description: Use this skill when the user asks to generate a Mermaid diagram, visualize architecture, show component relationships, or create a diagram from code files. Analyzes code to produce flowcharts, sequence diagrams, class diagrams, ER diagrams, and state diagrams.
 ---
 
 # Mermaid Diagram Generator
 
-Generate a Mermaid diagram based on supplied code files and directories to visualize system architecture, component relationships, data flow, or other structural aspects of the codebase.
+Use this skill to generate Mermaid diagrams from code files and directories to visualize system architecture, component relationships, data flow, or other structural aspects of a codebase.
 
-## Parameters
+## When to Use
 
-- `$ARGUMENTS` - One or more paths to files or directories to analyze. Can include:
-  - Individual files (e.g., `./src/auth/login.ts`)
-  - Directories (e.g., `./src/components/`)
-  - Glob patterns (e.g., `./src/**/*.ts`)
-  - Multiple paths separated by spaces
-
-**Examples:**
-- `/project:mermaid ./src/services/`
-- `/project:mermaid ./src/api/routes.ts ./src/middleware/`
-- `/project:mermaid ./src/features/auth/ flowchart`
-- `/project:mermaid ./src/ --type=sequence --focus=api-calls`
+- User asks to visualize or diagram code architecture
+- User wants to see component relationships
+- User needs to understand data flow in a system
+- User asks for a flowchart, sequence diagram, class diagram, or ER diagram
+- User wants to document system structure visually
 
 ## Process
 
 ### 1. Analyze the Codebase
 
-First, gather information about the specified files and directories:
+Gather information about the specified files and directories:
 
-1. **List all relevant files**
-   - Use Glob to find files matching the specified paths
-   - Filter by relevant file extensions (.ts, .tsx, .js, .jsx, .py, etc.)
+**List all relevant files:**
+- Use Glob to find files matching specified paths
+- Filter by relevant file extensions (.ts, .tsx, .js, .jsx, .py, etc.)
 
-2. **Read and parse the code**
-   - Identify exports, imports, and dependencies
-   - Extract class definitions, functions, and interfaces
-   - Map relationships between modules
-   - Identify data flow patterns
+**Read and parse the code:**
+- Identify exports, imports, and dependencies
+- Extract class definitions, functions, and interfaces
+- Map relationships between modules
+- Identify data flow patterns
 
-3. **Identify key architectural elements**
-   - Entry points and main modules
-   - Service layers and their interactions
-   - Data models and their relationships
-   - External integrations and APIs
-   - Event flows and async patterns
+**Identify key architectural elements:**
+- Entry points and main modules
+- Service layers and their interactions
+- Data models and their relationships
+- External integrations and APIs
+- Event flows and async patterns
 
 ### 2. Determine Diagram Type
 
-Based on the code structure and user intent, select the most appropriate diagram type:
+Select the most appropriate diagram type based on code structure and user intent:
 
 | Diagram Type | Best For |
-|-------------|----------|
+|--------------|----------|
 | `flowchart` | General architecture, module relationships, process flows |
 | `sequenceDiagram` | API calls, request/response flows, async operations |
 | `classDiagram` | Object-oriented code, type hierarchies, data models |
@@ -78,8 +73,6 @@ Enhance the diagram with:
 
 ## Output Format
 
-Provide the output in this structure:
-
 ```markdown
 ## Diagram Overview
 
@@ -99,7 +92,7 @@ Provide the output in this structure:
 ## Diagram Legend
 
 | Symbol/Color | Meaning |
-|-------------|---------|
+|--------------|---------|
 | [element] | [description] |
 
 ## Key Relationships
@@ -114,9 +107,10 @@ Provide the output in this structure:
 - [Suggestions for additional diagrams that might be useful]
 ```
 
-## Diagram-Specific Guidelines
+## Diagram-Specific Syntax
 
-### For Flowcharts
+### Flowcharts
+
 ```mermaid
 flowchart TB
     subgraph Layer["Layer Name"]
@@ -124,11 +118,14 @@ flowchart TB
     end
     A -->|"action"| C[Component C]
 ```
+
+Guidelines:
 - Use subgraphs to represent layers or domains
 - Show data flow direction with arrows
 - Label edges with the type of interaction
 
-### For Sequence Diagrams
+### Sequence Diagrams
+
 ```mermaid
 sequenceDiagram
     participant C as Client
@@ -139,11 +136,14 @@ sequenceDiagram
     D-->>S: Result
     S-->>C: Response
 ```
+
+Guidelines:
 - Focus on key interactions, not every function call
 - Show async operations with appropriate arrow types
 - Include error paths if significant
 
-### For Class Diagrams
+### Class Diagrams
+
 ```mermaid
 classDiagram
     class ClassName {
@@ -153,29 +153,43 @@ classDiagram
     ClassName <|-- SubClass : extends
     ClassName --> OtherClass : uses
 ```
+
+Guidelines:
 - Include public interfaces
 - Show inheritance and composition relationships
 - Use appropriate relationship symbols
 
-### For ER Diagrams
+### ER Diagrams
+
 ```mermaid
 erDiagram
     USER ||--o{ ORDER : places
     ORDER ||--|{ LINE-ITEM : contains
 ```
+
+Guidelines:
 - Focus on entities and their relationships
 - Use proper cardinality notation
 - Include key attributes
 
-## Special Instructions
+### State Diagrams
 
-- **Be pragmatic about scope** - For large directories, focus on the main architectural patterns rather than every file
-- **Infer intent** - If the user provides a specific subset of files, assume they want to understand that specific subsystem
-- **Handle ambiguity** - If multiple diagram types would be appropriate, either ask the user or provide the most generally useful one with a note about alternatives
-- **Keep diagrams renderable** - Mermaid has syntax limitations; ensure the output is valid Mermaid syntax
-- **Consider the audience** - Diagrams should be understandable by someone unfamiliar with the codebase
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Loading : fetch
+    Loading --> Success : resolve
+    Loading --> Error : reject
+    Success --> [*]
+    Error --> Idle : retry
+```
 
-## Error Handling
+Guidelines:
+- Show all meaningful states
+- Label transitions with triggering events
+- Include start and end states
+
+## Handling Edge Cases
 
 | Situation | Response |
 |-----------|----------|
@@ -184,3 +198,11 @@ erDiagram
 | Too many files for meaningful single diagram | Offer to create multiple focused diagrams or ask user to narrow scope |
 | Mixed languages/frameworks | Note this and focus on the dominant pattern or ask for clarification |
 | Circular dependencies detected | Include them in the diagram and highlight as a potential concern |
+
+## Best Practices
+
+- **Be pragmatic about scope** - For large directories, focus on main architectural patterns rather than every file
+- **Infer intent** - If the user provides a specific subset of files, assume they want to understand that specific subsystem
+- **Handle ambiguity** - If multiple diagram types would be appropriate, either ask the user or provide the most generally useful one with a note about alternatives
+- **Keep diagrams renderable** - Ensure output is valid Mermaid syntax
+- **Consider the audience** - Diagrams should be understandable by someone unfamiliar with the codebase

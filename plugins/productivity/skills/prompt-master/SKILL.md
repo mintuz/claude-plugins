@@ -1,56 +1,97 @@
 ---
-description: Expand a basic prompt into a detailed, XML-tagged guide with clear roles, tasks, and actionable instructions for Claude.
+name: prompt-master
+description: Use this skill when the user asks to improve, expand, enhance, or refine a prompt. Transforms basic prompts into comprehensive, XML-tagged instructions with clear roles, tasks, and actionable guidance for Claude.
 ---
 
 # Prompt Master
 
-Transform a simple prompt into a comprehensive, context-rich instruction set that follows Claude’s XML tag recommendations for clarity, depth, and actionable guidance.
+Use this skill to transform simple prompts into comprehensive, context-rich instruction sets that follow Claude's XML tag recommendations for clarity, depth, and actionable guidance.
 
-## Parameters
+## When to Use
 
-- `$ARGUMENTS` - The raw user prompt to enhance. Optionally append context, audience, constraints, tone, or goals.
-
-**Examples:**
-- `/project:prompt_master Act as a digital marketing strategist`
-- `/project:prompt_master Draft a customer support macro for refund requests --audience=customers --tone=calm`
-- `/project:prompt_master Build a study plan for calculus <context>College freshman, 6 weeks</context>`
+- User asks to improve or enhance a prompt
+- User wants to expand a basic prompt into detailed instructions
+- User needs to structure a prompt with clear roles and tasks
+- User wants to create a reusable prompt template
 
 ## Process
 
 ### 1. Understand the Input
-- Analyze the original prompt to understand objective, desired outcome, and success criteria.
-- Ask clarifying questions if key details are missing (audience, format, deadlines, constraints, tools) and suggest useful additions.
-- Wrap user-provided details in descriptive XML tags such as `<user_prompt>`, `<context>`, `<audience>`, `<tone>`, `<constraints>` to reduce ambiguity.
+
+Analyze the original prompt to understand:
+
+- **Objective** - What is the prompt trying to achieve?
+- **Desired outcome** - What should the output look like?
+- **Success criteria** - How will quality be measured?
+
+Ask clarifying questions if key details are missing:
+
+- Audience
+- Format requirements
+- Constraints or boundaries
+- Tools or integrations
+- Tone and style
+
+Wrap user-provided details in descriptive XML tags:
+
+- `<user_prompt>` - Original prompt
+- `<context>` - Background information
+- `<audience>` - Intended recipients
+- `<tone>` - Desired communication style
+- `<constraints>` - Limitations or boundaries
 
 ### 2. Refine the Prompt
-- Expand the prompt into detailed instructions with clear steps or sections; include specific actions the AI should follow.
-- Add useful examples inside `<example>` tags and clearly mark them as illustrative.
-- Incorporate missing elements that increase quality (edge cases, success criteria, data sources, goals, constraints).
-- Keep directives outside user-content tags to avoid conflating instructions with data.
 
-### 3. Offer Expertise and Solutions
-- Tailor the refined prompt to the subject matter; highlight key aspects, pitfalls, and best practices.
-- Provide real-world examples, scenarios, or use cases to guide the AI toward practical outputs.
-- If tools or schemas are involved, scope them in `<tools>`, `<function_call>`, or `<api_schema>` tags.
+- Expand into detailed instructions with clear steps or sections
+- Include specific actions the AI should follow
+- Add examples inside `<example>` tags, marked as illustrative
+- Incorporate missing elements:
+  - Edge cases
+  - Success criteria
+  - Data sources
+  - Goals and constraints
+- Keep directives outside user-content tags to avoid mixing instructions with data
+
+### 3. Add Domain Expertise
+
+- Tailor the refined prompt to the subject matter
+- Highlight key aspects, pitfalls, and best practices
+- Provide real-world examples, scenarios, or use cases
+- If tools or schemas are involved, scope them in:
+  - `<tools>` - Available tools
+  - `<function_call>` - Function definitions
+  - `<api_schema>` - API specifications
 
 ### 4. Structure with XML Tags
-- Use clear sections, each wrapped in tags:
-  - `<role>`Define the AI’s persona and mandate.</role>
-  - `<key_responsibilities>`List primary duties.</key_responsibilities>
-  - `<approach>`Outline methodology and ordered steps; use `<step number="">` for sequencing.</step>
-  - `<tasks>`List specific actions, checks, or points to address.</tasks>
-  - `<additional_considerations>`Add tips, risks, safety, or compliance notes.</additional_considerations>
-- For reasoning or scratch work, fence it in `<reasoning visibility="hidden">...</reasoning>` and state whether it should be hidden or shown.
-- Ensure tags are descriptive, properly nested, and closed; do not overlap or mix instructions inside user data tags.
+
+Use clear sections, each wrapped in descriptive tags:
+
+| Tag | Purpose |
+|-----|---------|
+| `<role>` | Define the AI's persona and mandate |
+| `<key_responsibilities>` | List primary duties |
+| `<approach>` | Outline methodology with ordered steps |
+| `<step number="">` | Individual steps in sequence |
+| `<tasks>` | Specific actions, checks, or points to address |
+| `<additional_considerations>` | Tips, risks, safety, or compliance notes |
+| `<reasoning visibility="hidden">` | Scratch work (specify if hidden or shown) |
+
+Guidelines:
+
+- Tags must be descriptive and properly nested
+- Close all tags correctly
+- Do not overlap tags
+- Do not mix instructions inside user data tags
 
 ### 5. Review and Refine
-- Confirm all aspects of the original prompt are addressed and expanded.
-- Maintain a professional, authoritative tone; ensure instructions are actionable and testable with success criteria.
-- Note assumptions, highlight missing inputs, and invite clarification.
 
-## Output Format
+- Confirm all aspects of the original prompt are addressed
+- Maintain a professional, authoritative tone
+- Ensure instructions are actionable and testable
+- Note assumptions and highlight missing inputs
+- Invite clarification where needed
 
-Return only the enhanced prompt (no extra commentary), in markdown with XML tags. Structure it like:
+## Output Template
 
 ```markdown
 You are an AI-powered prompt generator, designed to improve and expand basic prompts into comprehensive, context-rich instructions for the given role.
@@ -96,7 +137,11 @@ You are an AI-powered prompt generator, designed to improve and expand basic pro
 </example>
 ```
 
-**Example (marketing strategist)**:
+## Example: Digital Marketing Strategist
+
+**Input prompt:** "Act as a digital marketing strategist"
+
+**Enhanced output:**
 
 ```markdown
 You are an experienced digital marketing strategist, tasked with helping businesses develop and implement effective online marketing campaigns. Your role is to provide strategic guidance, tactical recommendations, and performance analysis across digital channels.
@@ -120,7 +165,7 @@ You are an experienced digital marketing strategist, tasked with helping busines
 </key_responsibilities>
 
 <approach>
-  <step number="1" title="Understand the client’s business and goals">
+  <step number="1" title="Understand the client's business and goals">
     - Ask about industry, target market, and unique selling propositions
     - Identify short-term and long-term objectives
     - Assess current digital marketing efforts and pain points
@@ -128,7 +173,7 @@ You are an experienced digital marketing strategist, tasked with helping busines
   <step number="2" title="Develop a tailored strategy">
     - Create a SWOT analysis of the digital presence
     - Propose a multi-channel approach aligned to goals and budget
-    - Set realistic timelines and milestones
+    - Set realistic milestones
   </step>
   <step number="3" title="Implementation and management">
     - Provide step-by-step guidance for execution
@@ -154,4 +199,9 @@ You are an experienced digital marketing strategist, tasked with helping busines
 </additional_considerations>
 ```
 
-Keep the final prompt concise, unambiguous, and immediately actionable. Apply XML tags wherever they improve separation of data, instructions, reasoning, or tooling details.
+## Writing Guidelines
+
+- Keep the final prompt concise, unambiguous, and immediately actionable
+- Apply XML tags wherever they improve separation of data, instructions, reasoning, or tooling
+- Return only the enhanced prompt without extra commentary
+- Structure output in markdown with XML tags

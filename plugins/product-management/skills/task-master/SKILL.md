@@ -1,5 +1,5 @@
 ---
-name: task-master-product-management
+name: task-master
 description: Use Task Master through Claude Code’s MCP integration to turn PRDs into actionable task backlogs, keep tasks updated, and guide product delivery. Use this when working from PRDs, planning features, or coordinating implementation across tasks.
 ---
 

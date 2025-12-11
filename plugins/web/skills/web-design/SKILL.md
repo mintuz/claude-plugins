@@ -1,9 +1,9 @@
 ---
-name: ui-essentials
+name: web-design
 description: concepts for designing beautiful, legible interfaces with minimal effort. Use this skill when improving layouts, typography, color, and component polish.
 ---
 
-# UI Essentials
+# Web Design
 
 Focus on clear hierarchy, generous spacing, and restrained styling to make interfaces feel intentional.
 

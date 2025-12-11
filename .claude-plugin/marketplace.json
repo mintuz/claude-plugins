@@ -9,7 +9,8 @@
     {
       "name": "productivity",
       "source": "./plugins/productivity",
-      "description": "Productivity Agents and skills to speed up your workflows."
+      "description": "Productivity Agents and skills to speed up your workflows.",
+      "skills": ["./plugins/productivity/skills/prompt-master"]
     },
     {
       "name": "typescript",
@@ -17,34 +18,30 @@
       "description": "Agents and skills that are specialised in writing Web Application TypeScript"
     },
     {
-      "name": "css",
-      "source": "./plugins/css",
-      "description": "Agents and skills that are specialised in authoring Web Application CSS Styles"
-    },
-    {
-      "name": "web-tdd",
-      "source": "./plugins/web-tdd",
-      "description": "Agents and skills that are specialised in writing Web Application TypeScript Tests using TDD"
-    },
-    {
-      "name": "react",
-      "source": "./plugins/react",
-      "description": "Agents and skills that are specialised in writing Web Application using React"
-    },
-    {
       "name": "system-design",
       "source": "./plugins/system-design",
-      "description": "Agents and skills that are specialised in writing Web Application System Design"
+      "description": "Agents and skills that are specialised in writing Web Application System Design",
+      "skills": ["./plugins/system-design/skills/mermaid-generator"]
     },
     {
       "name": "product-management",
       "source": "./plugins/product-management",
-      "description": "Agents and skills that are specialised in Product Management workflows"
+      "description": "Agents and skills that are specialised in Product Management workflows",
+      "skills": [
+        "./plugins/product-management/skills/task-master",
+        "./plugins/product-management/skills/prd-creator"
+      ]
     },
     {
-      "name": "web-design",
-      "source": "./plugins/web-design",
-      "description": "Agents and skills that are specialised in designing beautiful web applications"
+      "name": "web",
+      "source": "./plugins/web",
+      "description": "Agents and skills that are specialised in building and maintaining web applications",
+      "skills": [
+        "./plugins/web/skills/web-design",
+        "./plugins/web/skills/css",
+        "./plugins/web/skills/tdd",
+        "./plugins/web/skills/react"
+      ]
     }
   ]
 }
