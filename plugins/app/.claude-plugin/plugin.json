@@ -1,0 +1,13 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "Agents and skills for Swift app development on iOS.",
+  "author": {
+    "name": "Adam Bulmer",
+    "email": "[email protected]",
+    "url": "https://github.com/mintuz"
+  },
+  "repository": "https://github.com/mintuz/claude-plugins",
+  "license": "MIT",
+  "keywords": ["swift", "ios", "architecture", "microapps", "spm"]
+}

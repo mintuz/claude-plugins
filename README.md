@@ -7,6 +7,7 @@ Custom agents and skills for web development and productivity workflows.
 ```bash
 /plugin marketplace add https://github.com/mintuz/claude-plugins
 /plugin install core@mintuz-claude-plugins
+/plugin install app@mintuz-claude-plugins
 /plugin install web@mintuz-claude-plugins
 /plugin install typescript@mintuz-claude-plugins
 /plugin install system-design@mintuz-claude-plugins
@@ -20,6 +21,7 @@ Custom agents and skills for web development and productivity workflows.
 | Plugin | Description |
 |--------|-------------|
 | **core** | Core agents and skills for software development workflows |
+| **app** | Swift app architecture and modularization (microapps with SPM) |
 | **web** | Web application development (CSS, React, TDD, design) |
 | **typescript** | TypeScript strict mode and best practices |
 | **system-design** | Architecture visualization and code review |
@@ -36,6 +38,13 @@ Custom agents and skills for web development and productivity workflows.
 | `compare-branch` | Structured code review when comparing git branches |
 | `prompt-master` | Transform basic prompts into comprehensive XML-tagged instructions |
 | `expectations` | Working expectations and documentation practices |
+
+#### App
+
+| Skill | Description |
+|-------|-------------|
+| `microapps-architecture` | Build Swift microapps with Swift Package Manager: module-per-feature setup, Package.swift patterns, boundaries, and test wiring |
+| `swift-testing-basics` | Adopt the Swift Testing framework: @Test macros, #expect/#require patterns, and throwing/async assertions |
 
 #### Web
 
