@@ -47,7 +47,9 @@
         "./plugins/web/skills/web-design",
         "./plugins/web/skills/css",
         "./plugins/web/skills/tdd",
-        "./plugins/web/skills/react"
+        "./plugins/web/skills/react",
+        "./plugins/web/skills/react-testing",
+        "./plugins/web/skills/frontend-testing"
       ]
     }
   ]
