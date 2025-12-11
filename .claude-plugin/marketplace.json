@@ -16,7 +16,7 @@
         "./plugins/core/skills/compare-branch",
         "./plugins/core/skills/prompt-master",
         "./plugins/core/skills/expectations",
-        "./plugins/core/skills/pr"
+        "./plugins/core/skills/writing-documentation"
       ]
     },
     {

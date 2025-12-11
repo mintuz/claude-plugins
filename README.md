@@ -38,6 +38,7 @@ Custom agents and skills for web development and productivity workflows.
 | `compare-branch` | Structured code review when comparing git branches |
 | `prompt-master` | Transform basic prompts into comprehensive XML-tagged instructions |
 | `expectations` | Working expectations and documentation practices |
+| `writing-documentation` | Developer-focused writing: clear titles, structured headings, and concise paragraphs |
 
 #### App
 
