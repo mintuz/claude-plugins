@@ -22,16 +22,19 @@ Use this skill to generate Mermaid diagrams from code files and directories to v
 Gather information about the specified files and directories:
 
 **List all relevant files:**
+
 - Use Glob to find files matching specified paths
 - Filter by relevant file extensions (.ts, .tsx, .js, .jsx, .py, etc.)
 
 **Read and parse the code:**
+
 - Identify exports, imports, and dependencies
 - Extract class definitions, functions, and interfaces
 - Map relationships between modules
 - Identify data flow patterns
 
 **Identify key architectural elements:**
+
 - Entry points and main modules
 - Service layers and their interactions
 - Data models and their relationships
@@ -66,6 +69,7 @@ Construct the Mermaid diagram with these principles:
 ### 4. Add Annotations
 
 Enhance the diagram with:
+
 - Brief labels on relationships describing the interaction
 - Notes for complex or non-obvious connections
 - Color coding for different types of components (if helpful)
@@ -120,6 +124,7 @@ flowchart TB
 ```
 
 Guidelines:
+
 - Use subgraphs to represent layers or domains
 - Show data flow direction with arrows
 - Label edges with the type of interaction
@@ -138,6 +143,7 @@ sequenceDiagram
 ```
 
 Guidelines:
+
 - Focus on key interactions, not every function call
 - Show async operations with appropriate arrow types
 - Include error paths if significant
@@ -155,6 +161,7 @@ classDiagram
 ```
 
 Guidelines:
+
 - Include public interfaces
 - Show inheritance and composition relationships
 - Use appropriate relationship symbols
@@ -168,6 +175,7 @@ erDiagram
 ```
 
 Guidelines:
+
 - Focus on entities and their relationships
 - Use proper cardinality notation
 - Include key attributes
@@ -185,6 +193,7 @@ stateDiagram-v2
 ```
 
 Guidelines:
+
 - Show all meaningful states
 - Label transitions with triggering events
 - Include start and end states

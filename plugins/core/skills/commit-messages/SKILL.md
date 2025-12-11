@@ -1,12 +1,18 @@
 ---
-name: commit-message
-description: Generate conventional commit messages from staged changes. Explains the "why" not just the "what". Suggests splitting large commits.
-tools: Bash,Read,Grep,Glob
+name: commit-messages
+description: Use this skill when the user asks to write a commit message, needs help with conventional commits, or wants to understand how to structure git commits. Generates clear, conventional commit messages that explain the "why" not just the "what".
 ---
 
-# Commit Message Agent
+# Commit Messages
 
-Generate clear, conventional commit messages that explain the "why" not just the "what".
+Use this skill to generate clear, conventional commit messages that explain the "why" not just the "what". Follow this guide when writing commit messages or helping users structure their commits.
+
+## When to Use
+
+- User asks for help writing a commit message
+- User wants to understand conventional commit format
+- User needs to split a large commit into smaller ones
+- User asks about commit best practices
 
 ## Philosophy
 
@@ -14,17 +20,6 @@ Generate clear, conventional commit messages that explain the "why" not just the
 - **Atomic commits** - One logical change per commit
 - **Future readers** - Write for someone debugging at 2am in 6 months
 - **Searchable** - Make it easy to find with `git log --grep`
-
-## Process
-
-1. **Analyze staged changes** - `git diff --staged`
-2. **Assess commit scope** - Is this one logical change or multiple?
-3. **Recommend split if needed** - Large commits should be broken up
-4. **Identify primary type** - feat, fix, refactor, etc.
-5. **Determine scope** - Component or area affected
-6. **Write subject** - Clear, imperative, specific
-7. **Add body if needed** - Explain the "why"
-8. **Note breaking changes** - If any
 
 ## Format
 
@@ -171,7 +166,7 @@ Reduces search API calls by ~80% based on local testing.
 
 ## Output Format
 
-Provide the complete commit message ready to use:
+When generating commit messages, provide the complete message ready to use:
 
 ```
 type(scope): clear subject line
@@ -183,7 +178,7 @@ this was done, not just what was done.
 Fixes #123
 ```
 
-If the commit should be split:
+If the commit should be split, recommend splitting with specific guidance:
 
 ```markdown
 **Recommendation: Split this commit**
@@ -196,26 +191,14 @@ The staged changes include multiple unrelated changes:
 **Suggested commits:**
 
 1. First commit:
-```
+   ```
+   type(scope): first change
+   ```
 
-type(scope): first change
-
-```
 2. Second commit:
-```
+   ```
+   type(scope): second change
+   ```
 
-type(scope): second change
-
-```
 **To split:** Use `git reset HEAD` then stage files for each commit separately.
-```
-
-## AI Attribution
-
-When Claude generates commit messages, append:
-
-```
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```
