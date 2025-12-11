@@ -4,18 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code plugin marketplace repository containing custom agents and skills for web development and productivity workflows. Plugins are distributed via the Claude Code plugin marketplace system.
+Claude Code plugin marketplace repository containing custom agents and skills for web development and productivity workflows. Plugins are distributed via the Claude Code plugin marketplace system.
 
 ## Repository Structure
 
 ```
 .claude-plugin/marketplace.json    # Marketplace registry (plugin metadata)
 plugins/
-  css/                             # CSS best practices plugin
-  typescript/                      # TypeScript strict mode plugin
-  react/                           # React best practices plugin
-  web-tdd/                         # Test-Driven Development plugin
-  productivity/                    # Productivity workflows plugin
+  core/                            # Core development workflows (commits, learning, review)
+  web/                             # Web development (CSS, React, TDD, design)
+  typescript/                      # TypeScript strict mode and best practices
+  system-design/                   # Architecture visualization
+  product-management/              # PRDs, task management
 ```
 
 Each plugin follows this structure:
@@ -23,52 +23,45 @@ Each plugin follows this structure:
 plugins/[plugin-name]/
   .claude-plugin/plugin.json       # Plugin manifest
   agents/                          # Agent definitions (*.md files)
-  skills/                          # Knowledge bases (SKILL.md files)
+  skills/[skill-name]/SKILL.md     # Knowledge bases
 ```
 
 ## Installation
 
-Users install plugins via:
 ```
 /plugin marketplace add https://github.com/mintuz/claude-plugins
-/plugin install css@mintuz-claude-plugins
+/plugin install core@mintuz-claude-plugins
+/plugin install web@mintuz-claude-plugins
 /plugin install typescript@mintuz-claude-plugins
-/plugin install react@mintuz-claude-plugins
-/plugin install web-tdd@mintuz-claude-plugins
-/plugin install productivity@mintuz-claude-plugins
+/plugin install system-design@mintuz-claude-plugins
+/plugin install product-management@mintuz-claude-plugins
 ```
 
 ## Agent Definition Format
 
-Agents are defined in markdown files with YAML frontmatter:
+Agents are markdown files with YAML frontmatter in `plugins/[plugin]/agents/`:
 
 ```markdown
 ---
 name: agent-name
 description: >
-  Multi-line description of when to use this agent
-tools: Read, Grep, Glob, Bash    # Available tools
-model: sonnet                     # Model to use
-color: pink                       # UI color
+  When to use this agent
+tools: Read, Grep, Glob, Bash
+model: sonnet
+color: pink
 ---
 
 # Agent Title
 
-Agent instructions and prompts...
+Agent instructions...
 ```
 
-### Required Frontmatter Fields
-- `name` - Agent identifier (kebab-case)
-- `description` - When/how to invoke the agent
-- `tools` - Comma-separated list of available tools
-
-### Optional Frontmatter Fields
-- `model` - Model to use (sonnet, opus, haiku)
-- `color` - UI color for the agent
+**Required:** `name`, `description`, `tools`
+**Optional:** `model` (sonnet/opus/haiku), `color`
 
 ## Skill Definition Format
 
-Skills provide knowledge bases that agents can reference. Defined in `SKILL.md` files:
+Skills are `SKILL.md` files in `plugins/[plugin]/skills/[skill-name]/`:
 
 ```markdown
 ---
@@ -82,22 +75,16 @@ description: >
 Knowledge base content...
 ```
 
-## Adding New Agents
+## Adding New Content
 
-1. Create `.md` file in `plugins/[plugin-name]/agents/` directory
-2. Define YAML frontmatter with required fields: `name`, `description`, `tools`
-3. Write comprehensive agent instructions in markdown body
+**New Agent:** Create `.md` in `plugins/[plugin]/agents/` with frontmatter
 
-## Adding New Skills
+**New Skill:** Create `plugins/[plugin]/skills/[skill-name]/SKILL.md`
 
-1. Create directory in `plugins/[plugin-name]/skills/[skill-name]/`
-2. Add `SKILL.md` with frontmatter and knowledge base content
-
-## Adding New Plugins
-
-1. Create `plugins/[plugin-name]/.claude-plugin/plugin.json` with manifest
-2. Add plugin entry to `.claude-plugin/marketplace.json`
-3. Create `agents/` and optionally `skills/` directories
+**New Plugin:**
+1. Create `plugins/[plugin-name]/.claude-plugin/plugin.json`
+2. Add entry to `.claude-plugin/marketplace.json`
+3. Create `agents/` and/or `skills/` directories
 
 ## Plugin Manifest Schema (plugin.json)
 
@@ -106,14 +93,10 @@ Knowledge base content...
   "name": "plugin-name",
   "version": "1.0.0",
   "description": "Plugin description",
-  "author": {
-    "name": "Author Name",
-    "email": "email@example.com",
-    "url": "https://github.com/username"
-  },
-  "repository": "https://github.com/username/repo",
+  "author": { "name": "", "email": "", "url": "" },
+  "repository": "https://github.com/mintuz/claude-plugins",
   "license": "MIT",
-  "keywords": ["relevant", "keywords"]
+  "keywords": []
 }
 ```
 
@@ -127,7 +110,8 @@ Knowledge base content...
     {
       "name": "plugin-name",
       "source": "./plugins/plugin-name",
-      "description": "Plugin description"
+      "description": "Plugin description",
+      "skills": ["./plugins/plugin-name/skills/skill-name"]
     }
   ]
 }
@@ -135,8 +119,4 @@ Knowledge base content...
 
 ## Version Bumping
 
-When updating plugins, increment the `version` field in the relevant `plugin.json` file following semver conventions.
-
-## Credits
-
-Inspired by City Paul's dotfiles: https://github.com/citypaul/.dotfiles/tree/main/claude/.claude
+Increment `version` in the relevant `plugin.json` following semver when updating plugins.
