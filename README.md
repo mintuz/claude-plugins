@@ -84,4 +84,5 @@ Custom agents and skills for web development and productivity workflows.
 
 ## Credits
 
-Inspired by [City Paul's dotfiles](https://github.com/citypaul/.dotfiles/tree/main/claude/.claude)
+1. [City Paul's dotfiles](https://github.com/citypaul/.dotfiles/tree/main/claude/.claude)
+2. [Lee Cheneler's dotfiles](https://github.com/LeeCheneler/dotfiles)
