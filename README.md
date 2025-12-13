@@ -39,6 +39,7 @@ Custom agents, skills, and commands for software development workflows.
 | `compare-branch` | Structured code review when comparing git branches |
 | `prompt-master` | Transform basic prompts into comprehensive XML-tagged instructions |
 | `expectations` | Working expectations and documentation practices |
+| `status-updates` | Biweekly status updates that highlight impact, risks, glue work, and asks after clarifying the audience |
 | `writing` | Developer-focused writing: tutorials, how-tos, docs with clear structure |
 | `pr` | PR descriptions, sizing, and creation with gh CLI |
 

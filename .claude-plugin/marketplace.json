@@ -11,12 +11,13 @@
       "source": "./plugins/core",
       "description": "Core Agents and skills that aid software development workflows",
       "skills": [
-        "./plugins/core/skills/commit-message",
-        "./plugins/core/skills/learn",
+        "./plugins/core/skills/commit-messages",
         "./plugins/core/skills/compare-branch",
-        "./plugins/core/skills/prompt-master",
         "./plugins/core/skills/expectations",
-        "./plugins/core/skills/writing-documentation"
+        "./plugins/core/skills/learn",
+        "./plugins/core/skills/pr",
+        "./plugins/core/skills/prompt-master",
+        "./plugins/core/skills/writing"
       ]
     },
     {
@@ -36,7 +37,8 @@
       "description": "Agents and skills that are specialised in Product Management workflows",
       "skills": [
         "./plugins/product-management/skills/task-master",
-        "./plugins/product-management/skills/prd-creator"
+        "./plugins/product-management/skills/prd-creator",
+        "./plugins/core/skills/status-updates"
       ]
     },
     {
