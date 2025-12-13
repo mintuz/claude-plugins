@@ -17,6 +17,7 @@ Use this skill to draft 2-week updates that make your work visible, show impact,
 
 - Audience and channel: manager, exec, peers? Email, Slack, doc?
 - Time window: which two weeks? Tie to OKRs/roadmap item?
+- GitHub username: to pull your PRs from the past 2 weeks
 - Desired outcome: inform, influence a decision, unblock, or build trust?
 - Length/tone: bullets vs paragraph, confidence/health color?
 - Impact evidence: metrics, user/business outcomes, shipped artifacts?
@@ -60,6 +61,14 @@ Use this skill to draft 2-week updates that make your work visible, show impact,
 - Show progression: “Plan → In-progress → Done”; note delta from last update
 - Mention decisions made and decisions pending (with decision-maker)
 - Call out dependencies you’re unblocking and those you need unblocked
+
+## Pull Request evidence with `gh`
+
+- After collecting the GitHub username, fetch authored PRs from the last 14 days to ground the update:  
+  - macOS: `SINCE=$(date -v-14d +%Y-%m-%d)`  
+  - Linux: `SINCE=$(date -d '14 days ago' +%Y-%m-%d)`  
+  - `gh search prs --author <github-username> --created ">=$SINCE" --json title,url,createdAt,files,additions,deletions`  
+- Skim files to distill what code changed and the value delivered (why it matters, user/business effect), then weave into Highlights/Glue Work bullets with outcome-first phrasing.
 
 ## Glue Work Checklist (consider adding)
 
