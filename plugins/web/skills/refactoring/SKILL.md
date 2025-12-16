@@ -1,6 +1,6 @@
 ---
 name: refactoring
-description: Refactoring assessment and patterns. Use after tests pass (GREEN phase) to assess improvement opportunities.
+description: WHEN tests are green and you need a refactor plan; NOT for new feature delivery; commit-first safety with prioritized improvements.
 ---
 
 # Refactoring

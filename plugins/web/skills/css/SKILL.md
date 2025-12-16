@@ -1,6 +1,6 @@
 ---
 name: css
-description: Write CSS using best practices for production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, css styles, pages, or web applications. Generates polished and maintainable CSS.
+description: WHEN authoring CSS/styles/layout for web UI; outputs production-ready, accessible, maintainable CSS.
 ---
 
 # CSS Best Practices

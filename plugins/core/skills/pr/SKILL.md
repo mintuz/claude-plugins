@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Use this skill when writing PR descriptions, preparing changes for review, or creating pull requests with gh CLI. Covers templates, sizing, and reviewer-focused writing.
+description: WHEN drafting PR descriptions or sizing/splitting work; NOT for commit messages; provides reviewer-first templates and gh pr steps.
 ---
 
 # Pull Request Skills

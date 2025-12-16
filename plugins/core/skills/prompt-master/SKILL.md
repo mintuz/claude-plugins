@@ -1,6 +1,6 @@
 ---
 name: prompt-master
-description: Prompt refinement and structuring guidance. Use when asked to improve, expand, or structure a prompt into a clear XML-tagged instruction set with roles, tasks, and actionable guidance. Trigger when users request prompt enhancement, reusable templates, or clearer prompt structure.
+description: WHEN refining or structuring prompts; NOT executing tasks; outputs XML-tagged instructions with roles, tasks, constraints, and examples.
 ---
 
 # Prompt Master

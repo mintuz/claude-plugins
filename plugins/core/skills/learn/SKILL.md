@@ -1,6 +1,6 @@
 ---
 name: learn
-description: Use this skill when the user wants to document learnings, capture insights into CLAUDE.md, or needs guidance on how to structure institutional knowledge. Helps identify what's worth documenting and how to format it.
+description: WHEN capturing learnings/gotchas/decisions into CLAUDE.md; NOT trivial changes; guides what to record, where it lives, and format.
 ---
 
 # CLAUDE.md Learning Integration

@@ -1,6 +1,6 @@
 ---
 name: commit-messages
-description: Use this skill when the user asks to write a commit message, needs help with conventional commits. Generates clear, conventional commit messages that explain the "why" not just the "what".
+description: WHEN writing git/conventional commits; NOT for PR text; returns concise, why-first commit lines with proper type/scope.
 ---
 
 # Commit Messages

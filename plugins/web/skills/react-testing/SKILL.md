@@ -1,6 +1,6 @@
 ---
 name: react-testing
-description: React Testing Library patterns for testing React components, hooks, and context. Use when testing React applications.
+description: WHEN testing React components/hooks/context with React Testing Library; NOT e2e; covers renderHook, providers, forms, and anti-patterns.
 ---
 
 # React Testing Library

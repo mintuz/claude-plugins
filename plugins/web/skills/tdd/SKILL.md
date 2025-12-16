@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Write tests and code using Test-Driven Development principles. Use this skill when the user asks to write tests, implement features, or develop code that should follow TDD practices. Ensures behavior-focused testing and proper Red-Green-Refactor workflow.
+description: WHEN working in TDD Red-Green-Refactor; NOT ad-hoc coding; write tests first, add minimal code to green, then assess refactoring.
 ---
 
 # TDD Best Practices

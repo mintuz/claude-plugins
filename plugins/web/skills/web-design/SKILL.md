@@ -1,6 +1,6 @@
 ---
 name: web-design
-description: concepts for designing beautiful, legible interfaces with minimal effort. Use this skill when improving layouts, typography, color, and component polish.
+description: WHEN refining UI layout, typography, color, or polish; NOT code implementation; provides concise principles for intentional, legible design.
 ---
 
 # Web Design

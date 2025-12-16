@@ -1,6 +1,6 @@
 ---
 name: writing
-description: Write developer-facing tutorials, how-tos, reviews, proposals and docs with clear structure and SEO-aware titles. Use when creating or editing technical content for engineers.
+description: WHEN creating/editing developer docs/tutorials/proposals/reviews; delivers scannable structure, clear payoffs, and strong titles.
 ---
 
 # Developer Writing Playbook
@@ -25,8 +25,8 @@ Guidelines for creating technical content that developers can skim first and tru
 
 ## Quick Reference
 
-| Task | Guide |
-| ---- | ----- |
+| Task                        | Guide                          |
+| --------------------------- | ------------------------------ |
 | Structural formatting rules | [formatting.md](formatting.md) |
 
 ## When to Use Each Guide

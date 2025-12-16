@@ -1,6 +1,6 @@
 ---
 name: swift-testing
-description: Use this skill when writing tests for Swift code using the Swift Testing framework.
+description: WHEN writing tests in Swift with the Swift Testing framework; NOT XCTest.
 ---
 
 # Swift Testing Framework: Basics

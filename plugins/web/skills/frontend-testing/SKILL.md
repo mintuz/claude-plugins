@@ -1,6 +1,6 @@
 ---
 name: frontend-testing
-description: DOM Testing Library patterns for behavior-driven UI testing. Framework-agnostic patterns for testing user interfaces. Use when testing any front-end application.
+description: WHEN testing any front-end UI with DOM Testing Library; behavior-first queries, userEvent flows, async patterns.
 ---
 
 # Front-End Testing with DOM Testing Library
@@ -16,6 +16,7 @@ Testing Library exists to solve a fundamental problem: tests that break when you
 ### Two Types of Users
 
 Your UI components have two users:
+
 1. **End-users**: Interact through the DOM (clicks, typing, reading text)
 2. **Developers**: You, refactoring implementation
 
@@ -24,9 +25,10 @@ Your UI components have two users:
 ### Why This Matters
 
 **False negatives** (tests break on refactor):
+
 ```typescript
 // ❌ WRONG - Testing implementation (will break on refactor)
-it('should update internal state', () => {
+it("should update internal state", () => {
   const component = new CounterComponent();
   component.setState({ count: 5 }); // Coupled to state implementation
   expect(component.state.count).toBe(5);
@@ -34,9 +36,10 @@ it('should update internal state', () => {
 ```
 
 **Correct approach** (behavior-driven):
+
 ```typescript
 // ✅ CORRECT - Testing user-visible behavior
-it('should submit form when user clicks submit', async () => {
+it("should submit form when user clicks submit", async () => {
   const handleSubmit = vi.fn();
   const user = userEvent.setup();
 
@@ -47,8 +50,8 @@ it('should submit form when user clicks submit', async () => {
     </form>
   `);
 
-  await user.type(screen.getByLabelText(/email/i), 'test@example.com');
-  await user.click(screen.getByRole('button', { name: /submit/i }));
+  await user.type(screen.getByLabelText(/email/i), "test@example.com");
+  await user.click(screen.getByRole("button", { name: /submit/i }));
 
   expect(handleSubmit).toHaveBeenCalled();
 });
@@ -56,13 +59,13 @@ it('should submit form when user clicks submit', async () => {
 
 ## Quick Reference
 
-| Topic | Guide |
-| ----- | ----- |
-| Query selection priority and details | [queries.md](queries.md) |
-| userEvent patterns and interactions | [user-events.md](user-events.md) |
-| Async testing (findBy, waitFor) | [async-testing.md](async-testing.md) |
-| MSW for API mocking | [msw.md](msw.md) |
-| Common mistakes and fixes | [anti-patterns.md](anti-patterns.md) |
+| Topic                                  | Guide                                                                       |
+| -------------------------------------- | --------------------------------------------------------------------------- |
+| Query selection priority and details   | [queries.md](queries.md)                                                    |
+| userEvent patterns and interactions    | [user-events.md](user-events.md)                                            |
+| Async testing (findBy, waitFor)        | [async-testing.md](async-testing.md)                                        |
+| MSW for API mocking                    | [msw.md](msw.md)                                                            |
+| Common mistakes and fixes              | [anti-patterns.md](anti-patterns.md)                                        |
 | Accessibility-first testing principles | [accessibility-first-testing.md](references/accessibility-first-testing.md) |
 
 ## When to Use Each Guide

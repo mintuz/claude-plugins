@@ -1,6 +1,6 @@
 ---
 name: react
-description: Write React applications using production-ready architecture and best practices. Use this skill when the user asks to build React components, pages, features, or applications. Ensures scalable project structure, proper state management, and maintainable code.
+description: WHEN building React components/pages/apps; enforces scalable architecture, state management, API layer, performance patterns.
 ---
 
 # React Best Practices
@@ -17,16 +17,16 @@ Production-grade React development with feature-based architecture, type-safe st
 
 ## Quick Reference
 
-| Topic | Guide |
-| ----- | ----- |
-| Directory layout and feature modules | [project-structure.md](project-structure.md) |
-| Component design patterns | [component-patterns.md](component-patterns.md) |
-| State categories and solutions | [state-management.md](state-management.md) |
-| API client and request structure | [api-layer.md](api-layer.md) |
-| Code splitting and optimization | [performance.md](performance.md) |
-| useEffect guidance and alternatives | [useeffect.md](useeffect.md) |
-| Testing pyramid and strategy | [testing-strategy.md](references/testing-strategy.md) |
-| Project tooling standards | [project-standards.md](references/project-standards.md) |
+| Topic                                | Guide                                                   |
+| ------------------------------------ | ------------------------------------------------------- |
+| Directory layout and feature modules | [project-structure.md](project-structure.md)            |
+| Component design patterns            | [component-patterns.md](component-patterns.md)          |
+| State categories and solutions       | [state-management.md](state-management.md)              |
+| API client and request structure     | [api-layer.md](api-layer.md)                            |
+| Code splitting and optimization      | [performance.md](performance.md)                        |
+| useEffect guidance and alternatives  | [useeffect.md](useeffect.md)                            |
+| Testing pyramid and strategy         | [testing-strategy.md](references/testing-strategy.md)   |
+| Project tooling standards            | [project-standards.md](references/project-standards.md) |
 
 ## When to Use Each Guide
 

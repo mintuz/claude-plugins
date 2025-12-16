@@ -1,6 +1,6 @@
 ---
 name: typescript
-description: Use this skill when the user asks to write TypeScript code, define types, create schemas, or build type-safe applications. Generates production-ready, strictly-typed TypeScript.
+description: WHEN writing TypeScript, defining types/schemas, or building type-safe apps; outputs strict, schema-first, production-ready code.
 ---
 
 # TypeScript Best Practices
