@@ -1,5 +1,5 @@
 ---
-name: app-intent-first-driven-development
+name: app-intent-driven-development
 description: Use this skill when building features as App Intents first so the same intents power Siri/Shortcuts, widgets, and in-app SwiftUI flows without duplicating logic.
 ---
 

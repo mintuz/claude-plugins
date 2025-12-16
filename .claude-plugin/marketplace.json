@@ -15,7 +15,8 @@
         "./plugins/core/skills/expectations",
         "./plugins/core/skills/learn",
         "./plugins/core/skills/pr",
-        "./plugins/core/skills/writing"
+        "./plugins/core/skills/writing",
+        "./plugins/core/skills/prompt-master"
       ]
     },
     {
