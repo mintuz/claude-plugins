@@ -4,19 +4,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Claude Code plugin marketplace repository containing custom agents, skills, and commands for software development workflows. Plugins are distributed via the Claude Code plugin marketplace system.
+Claude Code plugin marketplace containing six plugins for software development workflows:
+
+- core – memory, commit hygiene, refactoring, prompt refinement, and branch review
+- web – CSS, React, testing, refactoring, and design practices
+- typescript – strict, schema-first TypeScript guidance
+- system-design – Mermaid diagram generation from code
+- product-management – PRD creation and status updates
+- app – Swift iOS testing and App Intent-first workflows
 
 ## Repository Structure
 
 ```
 .claude-plugin/marketplace.json    # Marketplace registry (plugin metadata)
 plugins/
-  core/                            # Core workflows: commits, learning, review, PRs, memory
-  web/                             # Web development: CSS, React, TDD, testing, design
-  typescript/                      # TypeScript strict mode and best practices
-  system-design/                   # Architecture visualization with Mermaid
-  product-management/              # PRDs, task management with Task Master MCP
-  app/                             # Swift iOS development with App Intents
+  core/
+    .claude-plugin/plugin.json
+    agents/                        # compare-branch, prompt-master, refactor
+    commands/                      # init, remember, recall
+    skills/                        # commit-messages, expectations, learn, pr, writing
+  web/
+    .claude-plugin/plugin.json
+    skills/                        # css, frontend-testing, react, react-testing, refactoring, tdd, web-design
+  typescript/
+    .claude-plugin/plugin.json
+    skills/                        # typescript-best-practices
+  system-design/
+    .claude-plugin/plugin.json
+    agents/                        # mermaid-generator
+  product-management/
+    .claude-plugin/plugin.json
+    agents/                        # prd-creator, status-updates
+  app/
+    .claude-plugin/plugin.json
+    skills/                        # app-intent-driven-development, swift-testing
 ```
 
 Each plugin follows this structure:
@@ -50,6 +71,21 @@ Agent instructions...
 **Required:** `name`, `description`, `tools`
 **Optional:** `model` (sonnet/opus/haiku), `color`
 
+## Command Definition Format
+
+Commands live in `plugins/[plugin]/commands/` and include a short YAML header:
+
+```markdown
+---
+description: What the command does
+argument-hint: <argument format>
+---
+
+# @command-name
+
+Usage details...
+```
+
 ## Skill Definition Format
 
 Skills are `SKILL.md` files in `plugins/[plugin]/skills/[skill-name]/`:
@@ -65,6 +101,15 @@ description: >
 
 Knowledge base content...
 ```
+
+## Available Content Snapshot
+
+- **core:** agents `compare-branch`, `prompt-master`, `refactor`; commands `@init`, `/remember`, `/recall`; skills `commit-messages`, `expectations`, `learn`, `pr`, `writing`
+- **web:** skills `css`, `frontend-testing`, `react`, `react-testing`, `refactoring`, `tdd`, `web-design`
+- **typescript:** skill `typescript-best-practices`
+- **system-design:** agent `mermaid-generator`
+- **product-management:** agents `prd-creator`, `status-updates`
+- **app:** skills `app-intent-driven-development`, `swift-testing`
 
 ## Adding New Content
 

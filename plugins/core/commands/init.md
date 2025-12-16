@@ -10,7 +10,7 @@ Initialize a Claude Code session by loading the Expectations skill and ensuring 
 ## What This Does
 
 - Ask which CLAUDE.md to edit (defaults to `./CLAUDE.md` in the current working directory)
-- Load and execute the `plugins/core/skills/expectations/SKILL.md` skill every session
+- Load and execute the `core:expectations` skill every session
 - Ensure CLAUDE.md explicitly references the Expectations skill
 - Preserve existing CLAUDE.md content while appending the reference if missing
 
@@ -24,7 +24,7 @@ Initialize a Claude Code session by loading the Expectations skill and ensuring 
 
 2. **Load Expectations skill for this session**
 
-   - Bring `plugins/core/skills/expectations/SKILL.md` into context and treat it as active guidance for the session.
+   - Bring `core:expectations` into context and treat it as active guidance for the session.
    - If skill loading fails, stop and ask for next steps before continuing.
 
 3. **Update CLAUDE.md with Expectations reference**
@@ -38,7 +38,7 @@ Initialize a Claude Code session by loading the Expectations skill and ensuring 
 
      This project uses the core Expectations skill. Review and follow it at session start:
 
-     - Source: plugins/core/skills/expectations/SKILL.md
+     - Skill: "core:expectations"
      - Action: Load this skill every session before making changes.
      ```
 

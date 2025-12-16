@@ -35,13 +35,10 @@ Custom agents, skills, and commands for software development workflows.
 | Skill | Description |
 |-------|-------------|
 | `commit-messages` | Conventional commit messages that explain the "why" not just the "what" |
-| `learn` | Document learnings and capture insights into CLAUDE.md |
-| `compare-branch` | Structured code review when comparing git branches |
-| `prompt-master` | Transform basic prompts into comprehensive XML-tagged instructions |
 | `expectations` | Working expectations and documentation practices |
-| `status-updates` | Biweekly status updates that highlight impact, risks, glue work, and asks after clarifying the audience |
-| `writing` | Developer-focused writing: tutorials, how-tos, docs with clear structure |
+| `learn` | Document learnings and capture insights into CLAUDE.md |
 | `pr` | PR descriptions, sizing, and creation with gh CLI |
+| `writing` | Developer-focused writing: tutorials, how-tos, docs with clear structure |
 
 ### Web
 
@@ -70,30 +67,30 @@ Custom agents, skills, and commands for software development workflows.
 
 ### System Design
 
-| Skill | Description |
-|-------|-------------|
-| `mermaid-generator` | Generate Mermaid diagrams from code (flowcharts, sequence, class, ER, state) |
+No standalone skills; see the `mermaid-generator` agent below.
 
 ### Product Management
 
-| Skill | Description |
-|-------|-------------|
-| `task-master` | Turn PRDs into actionable task backlogs via Task Master MCP |
-| `prd-creator` | Create comprehensive Product Requirements Documents |
+Skills are covered via agents; see `prd-creator` and `status-updates` below.
 
 ## Agents
 
 | Agent | Plugin | Description |
 |-------|--------|-------------|
-| `refactor-scan` | core | Refactoring coach for TDD's third step. Guides semantic vs structural decisions and assesses code quality |
+| `compare-branch` | core | Branch comparison code review agent for structured findings across functionality, security, performance, and edge cases |
+| `prompt-master` | core | Prompt refinement agent that expands prompts into XML-tagged, structured instructions |
+| `refactor` | core | Refactoring coach to assess and guide meaningful abstractions after tests are green |
+| `mermaid-generator` | system-design | Generates Mermaid diagrams from code to visualize architecture and flows |
+| `prd-creator` | product-management | Builds complete PRDs with structure, requirements, risks, and success criteria |
+| `status-updates` | product-management | Crafts two-week status updates with audience-aware tone, risks, and impact |
 
 ## Commands
 
 | Command | Plugin | Description |
 |---------|--------|-------------|
+| `@init [path-to-CLAUDE.md]` | core | Initialize a session, load the Expectations skill, and ensure CLAUDE.md references it |
 | `/remember <topic>` | core | Store knowledge in persistent memory for future sessions |
-| `/recollect <topic>` | core | Recall memories into the current session |
-| `/prd_creator` | product-management | Interactive PRD generation wizard |
+| `/recall <topic>` | core | Recall memories into the current session |
 
 ## MCP Integrations
 
