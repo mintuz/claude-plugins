@@ -1,6 +1,6 @@
 ---
 name: commit-messages
-description: Use this skill when the user asks to write a commit message, needs help with conventional commits, or wants to understand how to structure git commits. Generates clear, conventional commit messages that explain the "why" not just the "what".
+description: Use this skill when the user asks to write a commit message, needs help with conventional commits. Generates clear, conventional commit messages that explain the "why" not just the "what".
 ---
 
 # Commit Messages
@@ -191,14 +191,18 @@ The staged changes include multiple unrelated changes:
 **Suggested commits:**
 
 1. First commit:
-   ```
-   type(scope): first change
-   ```
+```
+
+type(scope): first change
+
+```
 
 2. Second commit:
-   ```
-   type(scope): second change
-   ```
+```
+
+type(scope): second change
+
+```
 
 **To split:** Use `git reset HEAD` then stage files for each commit separately.
 ```

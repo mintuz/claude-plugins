@@ -3,7 +3,7 @@ description: Recall memories into the current session
 argument-hint: <topic>
 ---
 
-# Recollect Command
+# Recall Command
 
 Pull relevant memories into the current session.
 
@@ -54,10 +54,10 @@ Use /remember to store knowledge for future sessions.
 ## Examples
 
 ```
-/recollect authentication
-/recollect api patterns
-/recollect project constraints
-/recollect zod validation
+/recall authentication
+/recall api patterns
+/recall project constraints
+/recall zod validation
 ```
 
 ## Rules
