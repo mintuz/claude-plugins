@@ -53,7 +53,8 @@
       "description": "Agents and skills for Swift app development on iOS",
       "skills": [
         "./plugins/app/skills/swift-testing",
-        "./plugins/app/skills/app-intent-driven-development"
+        "./plugins/app/skills/app-intent-driven-development",
+        "./plugins/app/skills/swiftui-architecture"
       ]
     }
   ]

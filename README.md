@@ -58,6 +58,7 @@ Custom agents, skills, and commands for software development workflows.
 | ------------------------------- | ----------------------------------------------------------------------------- |
 | `swift-testing`                 | Swift Testing framework: @Test macros, #expect/#require patterns              |
 | `app-intent-driven-development` | Build features as App Intents first for Siri, Shortcuts, widgets, and SwiftUI |
+| `swiftui-architecture`          | Modern SwiftUI patterns: @Observable, state management, no ViewModels         |
 
 ### TypeScript
 
