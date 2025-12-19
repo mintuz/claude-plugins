@@ -32,7 +32,10 @@
     {
       "name": "product-management",
       "source": "./plugins/product-management",
-      "description": "Agents and skills that are specialised in Product Management workflows"
+      "description": "Agents and skills that are specialised in Product Management workflows",
+      "skills": [
+        "./plugins/product-management/skills/status-updates"
+      ]
     },
     {
       "name": "web",
