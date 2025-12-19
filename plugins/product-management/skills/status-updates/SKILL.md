@@ -9,17 +9,20 @@ Guidelines for writing team updates that are easy to scan, honest about challeng
 
 ## Philosophy
 
-- **Outcomes first** - Lead with results and impact, not activity
+- **Outcomes first** - Lead with results and impact, not activity; tie to goals/OKRs
 - **Scannable** - Emoji-anchored sections, bullet points, short paragraphs
+- **Quantify** - Metrics, deltas, dates, owners—show progress with numbers
 - **Honest** - Acknowledge challenges directly, then reframe with context
 - **Warm** - Credit individuals by name, use inclusive language
 - **Evidence-backed** - Link to production, docs, metrics to show not tell
+- **Close the loop** - Note delta from last update and what's next
 
 ## Quick Reference
 
 | Task | Guide |
 |------|-------|
 | Voice and tone patterns | [tone-profile.md](tone-profile.md) |
+| PR evidence gathering | [pr-evidence.md](pr-evidence.md) |
 
 ## When to Use
 
@@ -28,6 +31,33 @@ Guidelines for writing team updates that are easy to scan, honest about challeng
 - Slack channel announcements
 - Sprint summaries or retrospectives
 - Launch communications
+
+## Intake Questions
+
+Ask these before drafting to ensure the update hits the right notes:
+
+**Essential:**
+
+- Audience & channel (manager, exec, peers? email, Slack, doc?)
+- Time window (which two weeks? tie to OKRs/roadmap item?)
+- Desired outcome (inform, influence decision, unblock, build trust?)
+
+**Evidence gathering:**
+
+- GitHub username (to pull authored PRs from past 14 days)
+- Impact evidence (metrics, user/business outcomes, shipped artifacts?)
+
+**Framing:**
+
+- Risks/blockers (what needs escalation, by when?)
+- Length/tone preference (bullets vs paragraph, RAG color?)
+
+**Recognition:**
+
+- Glue work to highlight (reviews, incidents, mentoring, docs, coordination?)
+- Who to thank or spotlight?
+
+If details are missing, ask concise clarifying questions before drafting.
 
 ## Core Patterns
 
@@ -55,36 +85,10 @@ Weave links naturally into claims:
 
 Use footnotes for caveats that would clutter the main flow.
 
-## Format Templates
-
-### Progress Update (Default)
-
-```markdown
-[Optional seasonal hook]
-
-**:emoji: Section Title**
-
-[1-2 sentence summary]
-
-- [Outcome with inline link]
-- [Component work with `backticks`]
-- [Connection to future benefit]
-
-Big thanks to @person1, @person2, @person3
-
-**:emoji: Next Section**
-...
-```
-
-### Quick Patterns
-
-- **3-2-1:** 3 wins, 2 risks/issues, 1 ask (exec-friendly)
-- **RAG:** Status color + summary + mitigation + target date
-- **Past/Present/Future:** Shipped, in flight, coming next
-
 ## Do's and Don'ts
 
 **Do:**
+
 - Open with a hook before diving in
 - Use emoji for visual hierarchy (one per section)
 - Credit individuals by name
@@ -93,6 +97,7 @@ Big thanks to @person1, @person2, @person3
 - End with momentum
 
 **Don't:**
+
 - Bury or avoid bad news
 - Use emoji as decoration
 - Give vague thanks ("thanks everyone")
@@ -100,3 +105,23 @@ Big thanks to @person1, @person2, @person3
 - Over-explain technical concepts
 
 For detailed voice characteristics and replication techniques, see [tone-profile.md](tone-profile.md).
+
+---
+
+## Writing Guidance
+
+**Phrasing:**
+
+- Use verbs + outcomes: "Shipped X → improved Y by Z%" not "Worked on X"
+- Keep bullets single-line; front-load result, back-load detail
+- Include dates/owners for risks and asks
+
+**Progression:**
+
+- Note delta from last update ("Previously blocked, now shipped")
+- Mention decisions made and decisions pending (with decision-maker)
+
+**Dependencies:**
+
+- Call out dependencies you're unblocking for others
+- Call out dependencies you need unblocked

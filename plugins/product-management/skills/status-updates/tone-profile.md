@@ -90,6 +90,7 @@ Use a light touch of playfulness paired with a named individual.
 End sections with forward-looking statements that create anticipation.
 
 **Examples:**
+
 - "will kick off in January"
 - "this month"
 - "in the new year once we've validated the design"
