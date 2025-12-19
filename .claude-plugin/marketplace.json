@@ -44,7 +44,8 @@
         "./plugins/web/skills/tdd",
         "./plugins/web/skills/react",
         "./plugins/web/skills/react-testing",
-        "./plugins/web/skills/frontend-testing"
+        "./plugins/web/skills/frontend-testing",
+        "./plugins/web/skills/eyes"
       ]
     },
     {
