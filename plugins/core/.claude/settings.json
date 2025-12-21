@@ -2,11 +2,10 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "*",
         "hooks": [
           {
-            "type": "command",
-            "command": "cat <<'EOF'\n\n📋 Loading core:expectations skill for this session...\n\nThis project follows TDD principles and documentation standards.\nThe expectations skill provides guidelines for:\n- Test-Driven Development (TDD)\n- Code change principles\n- Documentation framework\n- Communication standards\n\nPlease load the expectations skill to understand project expectations.\nEOF"
+            "type": "prompt",
+            "prompt": "This project uses the core:expectations skill. Load this skill now using the Skill tool to understand the project's TDD principles, code change guidelines, documentation framework, and communication standards. The expectations skill is essential for all work in this codebase."
           }
         ]
       }
