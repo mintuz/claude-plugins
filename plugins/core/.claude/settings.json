@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat <<'EOF'\n\n📋 Loading core:expectations skill for this session...\n\nThis project follows TDD principles and documentation standards.\nThe expectations skill provides guidelines for:\n- Test-Driven Development (TDD)\n- Code change principles\n- Documentation framework\n- Communication standards\n\nPlease load the expectations skill to understand project expectations.\nEOF"
+          }
+        ]
+      }
+    ]
+  }
+}
