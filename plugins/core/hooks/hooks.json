@@ -1,4 +1,5 @@
 {
+  "description": "Core plugin hooks for auto-loading the expectations skill at session start",
   "hooks": {
     "SessionStart": [
       {
