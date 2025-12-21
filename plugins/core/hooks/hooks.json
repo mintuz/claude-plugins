@@ -1,0 +1,15 @@
+{
+  "description": "Core plugin hooks for auto-loading the expectations skill at session start",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "This project uses the core:expectations skill. Load this skill now using the Skill tool to understand the project's TDD principles, code change guidelines, documentation framework, and communication standards. The expectations skill is essential for all work in this codebase."
+          }
+        ]
+      }
+    ]
+  }
+}
