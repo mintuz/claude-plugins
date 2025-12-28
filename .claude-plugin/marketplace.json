@@ -33,9 +33,7 @@
       "name": "product-management",
       "source": "./plugins/product-management",
       "description": "Agents and skills that are specialised in Product Management workflows",
-      "skills": [
-        "./plugins/product-management/skills/status-updates"
-      ]
+      "skills": ["./plugins/product-management/skills/status-updates"]
     },
     {
       "name": "web",
@@ -61,6 +59,12 @@
         "./plugins/app/skills/swiftui-architecture",
         "./plugins/app/skills/debug"
       ]
+    },
+    {
+      "name": "life",
+      "source": "./plugins/life",
+      "description": "Agents and skills for personal life management",
+      "skills": ["./plugins/life/skills/gps-method"]
     }
   ]
 }
