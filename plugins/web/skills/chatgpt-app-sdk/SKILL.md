@@ -16,6 +16,17 @@ ChatGPT app development using the OpenAI Apps SDK, Model Context Protocol (MCP),
 | React patterns and window.openai API            | [ui-components.md](references/ui-components.md)       |
 | Three-tier state architecture and best practice | [state-management.md](references/state-management.md) |
 
+## Critical Setup Requirements
+
+| Issue               | Prevention                                            |
+| ------------------- | ----------------------------------------------------- |
+| CORS blocking       | Enable `https://chatgpt.com` origin on endpoints      |
+| Widget 404s         | Use `ui://widget/` prefix format for widget resources |
+| Plain text display  | Set MIME type to `text/html+skybridge` for widgets    |
+| Tool not suggested  | Use action-oriented descriptions in tool definitions  |
+| Missing widget data | Pass initial data via `_meta.initialData` field       |
+| CSP script blocking | Use inline scripts only (no external script tags)     |
+
 ## When to Use Each Guide
 
 ### UI Guidelines
