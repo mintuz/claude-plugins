@@ -8,7 +8,9 @@
       "Skill(expectations)",
       "Skill(learn)",
       "Skill(pr)",
-      "Skill(writing)"
+      "Skill(writing)",
+      "WebFetch(domain:developers.openai.com)",
+      "WebFetch(domain:openai.github.io)"
     ]
   }
 }
