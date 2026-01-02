@@ -128,3 +128,11 @@ Does this require:
 ├── Yes → Custom UI component
 └── No → Return plain text/markdown in content
 ```
+
+# Official Documentation
+
+- MCP Specification: https://modelcontextprotocol.io
+- TypeScript MCP SDK: https://github.com/modelcontextprotocol/typescript-sdk
+- OpenAI Apps SDK: https://developers.openai.com/apps-sdk
+- MCP Apps Extension: http://blog.modelcontextprotocol.io/posts/2025-11-21-mcp-apps
+- ChatGPT Component Library: https://openai.github.io/apps-sdk-ui
