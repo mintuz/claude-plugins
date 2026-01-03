@@ -1,7 +1,14 @@
 ---
 name: tailwind
-description: WHEN building design systems or component libraries with Tailwind CSS; covers design tokens, CVA patterns, forms, layouts, animations, and dark mode.
+description: WHEN building design systems or component libraries with Tailwind CSS; covers design tokens, CVA patterns and dark mode.
 ---
+
+# Prerequisites
+
+- Load the `web:css` skill for CSS Best Practices.
+- Load the `web:react` skill for React Best Practices.
+- Load the `web:typescript` skill for TypeScript Best Practices.
+- load the `web:web-design` skill for Design Best Practices.
 
 # Tailwind Design System
 
@@ -13,10 +20,7 @@ Build production-ready design systems with Tailwind CSS, including design tokens
 | ----------------------------------- | ------------------------------------------------- |
 | Tailwind config, global CSS, tokens | [setup.md](references/setup.md)                   |
 | CVA pattern with type-safe variants | [cva-components.md](references/cva-components.md) |
-| Form components with error handling | [forms.md](references/forms.md)                   |
-| Responsive Grid and Container       | [layout.md](references/layout.md)                 |
 | Animation utilities and Dialog      | [animations.md](references/animations.md)         |
-| Dark mode provider and toggle       | [dark-mode.md](references/dark-mode.md)           |
 | Utility functions (cn, focusRing)   | [utilities.md](references/utilities.md)           |
 | Do's and Don'ts for maintainability | [best-practices.md](references/best-practices.md) |
 
@@ -27,7 +31,6 @@ Build production-ready design systems with Tailwind CSS, including design tokens
 - Building responsive and accessible components
 - Standardizing UI patterns across a codebase
 - Migrating to or extending Tailwind CSS
-- Setting up dark mode and color schemes
 
 ## Core Concepts
 
@@ -68,23 +71,6 @@ Use [cva-components.md](references/cva-components.md) when you need:
 - Standardized variant APIs
 - Reusable component patterns
 
-### Forms
-
-Use [forms.md](references/forms.md) when you need:
-
-- Input components with validation
-- Label associations
-- Error handling patterns
-- Form integration with React Hook Form
-
-### Layout
-
-Use [layout.md](references/layout.md) when you need:
-
-- Responsive grid systems
-- Container components
-- Consistent spacing and breakpoints
-
 ### Animations
 
 Use [animations.md](references/animations.md) when you need:
@@ -93,15 +79,6 @@ Use [animations.md](references/animations.md) when you need:
 - Dialog or modal transitions
 - Tailwind CSS Animate utilities
 - State-based animations
-
-### Dark Mode
-
-Use [dark-mode.md](references/dark-mode.md) when you need:
-
-- Theme provider setup
-- Theme toggle component
-- System preference integration
-- Persistent theme storage
 
 ### Utilities
 
@@ -122,16 +99,6 @@ Use [best-practices.md](references/best-practices.md) for:
 
 ## Quick Decision Trees
 
-### How should I handle theming?
-
-```
-Do I need runtime theme switching?
-├── Yes → Use CSS variables (setup.md) + Theme Provider (dark-mode.md)
-└── No → Can I use just dark mode variants?
-    ├── Yes → Use dark: prefix with class-based dark mode
-    └── No → Extend theme with static values
-```
-
 ### Where should colors be defined?
 
 ```
@@ -148,13 +115,9 @@ Is this a one-off color?
 
 ```bash
 # Required packages
-npm install tailwindcss postcss autoprefixer
-npm install class-variance-authority clsx tailwind-merge
-npm install tailwindcss-animate
-
-# Optional (for components)
-npm install @radix-ui/react-dialog @radix-ui/react-slot
-npm install lucide-react
+yarn add tailwindcss postcss autoprefixer
+yarn add class-variance-authority clsx tailwind-merge
+yarn add tailwindcss-animate
 ```
 
 ## Resources
