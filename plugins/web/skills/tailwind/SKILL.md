@@ -1,6 +1,6 @@
 ---
 name: tailwind
-description: Build scalable design systems with Tailwind CSS, design tokens, component libraries, and responsive patterns. Use when creating component libraries, implementing design systems, or standardizing UI patterns.
+description: WHEN building design systems or component libraries with Tailwind CSS; covers design tokens, CVA patterns, forms, layouts, animations, and dark mode.
 ---
 
 # Tailwind Design System
