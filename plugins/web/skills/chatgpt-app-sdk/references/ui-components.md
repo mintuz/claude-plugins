@@ -4,6 +4,7 @@
 
 - Load the `web:react` skill for React Best Practices.
 - Load the `web:css` skill for CSS Best Practices.
+- Load the `web:tailwind` skill for Tailwind CSS Best Practices.
 - Load the `web:react-testing` skill for React Testing Library Best Practices.
 - Load the `typescript` skill for TypeScript Best Practices.
 
