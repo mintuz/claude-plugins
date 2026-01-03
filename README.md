@@ -15,6 +15,7 @@ Custom agents, skills, and commands for software development workflows.
 /plugin install system-design@mintuz-claude-plugins
 /plugin install product-management@mintuz-claude-plugins
 /plugin install app@mintuz-claude-plugins
+/plugin install life@mintuz-claude-plugins
 ```
 
 ## Plugins
@@ -22,11 +23,12 @@ Custom agents, skills, and commands for software development workflows.
 | Plugin                 | Description                                                                                  |
 | ---------------------- | -------------------------------------------------------------------------------------------- |
 | **core**               | Core workflows: commits, learning, code review, prompts, PRs, writing, and persistent memory |
-| **web**                | Web development with CSS, React, TDD, testing, and design patterns                           |
+| **web**                | Web development with CSS, React, Tailwind, TDD, testing, and design patterns                 |
 | **typescript**         | TypeScript strict mode, schema-first development, and best practices                         |
 | **system-design**      | Architecture visualization with Mermaid diagrams                                             |
-| **product-management** | PRDs, task management with Task Master MCP                                                   |
-| **app**                | Swift iOS development with App Intents and Swift Testing                                     |
+| **product-management** | PRDs, task management with Task Master MCP, and status updates                               |
+| **app**                | Swift iOS development with App Intents, Swift Testing, and SwiftUI architecture              |
+| **life**               | Personal life management with GPS method for goal achievement                                |
 
 ## Skills
 
@@ -42,15 +44,18 @@ Custom agents, skills, and commands for software development workflows.
 
 ### Web
 
-| Skill              | Description                                                        |
-| ------------------ | ------------------------------------------------------------------ |
-| `css`              | CSS best practices for maintainable, scalable styles               |
-| `react`            | Production-ready React architecture and patterns                   |
-| `react-testing`    | React Testing Library patterns for components, hooks, and context  |
-| `frontend-testing` | DOM Testing Library patterns for behavior-driven UI testing        |
-| `tdd`              | Test-Driven Development principles and Red-Green-Refactor workflow |
-| `refactoring`      | Refactoring assessment and patterns after tests pass               |
-| `web-design`       | Visual hierarchy, spacing, typography, and UI polish               |
+| Skill              | Description                                                                  |
+| ------------------ | ---------------------------------------------------------------------------- |
+| `css`              | CSS best practices for maintainable, scalable styles                        |
+| `react`            | Production-ready React architecture and patterns                             |
+| `react-testing`    | React Testing Library patterns for components, hooks, and context            |
+| `frontend-testing` | DOM Testing Library patterns for behavior-driven UI testing                  |
+| `tdd`              | Test-Driven Development principles and Red-Green-Refactor workflow           |
+| `refactoring`      | Refactoring assessment and patterns after tests pass                         |
+| `web-design`       | Visual hierarchy, spacing, typography, and UI polish                         |
+| `tailwind`         | Design systems with Tailwind CSS, design tokens, and component libraries     |
+| `eyes`             | Visual feedback loop with Playwright screenshots for UI iteration            |
+| `chatgpt-app-sdk`  | Build ChatGPT apps using OpenAI Apps SDK and MCP with conversational UX      |
 
 ### App
 
@@ -59,6 +64,7 @@ Custom agents, skills, and commands for software development workflows.
 | `swift-testing`                 | Swift Testing framework: @Test macros, #expect/#require patterns              |
 | `app-intent-driven-development` | Build features as App Intents first for Siri, Shortcuts, widgets, and SwiftUI |
 | `swiftui-architecture`          | Modern SwiftUI patterns: @Observable, state management, no ViewModels         |
+| `debug`                         | Structured feedback loop for debugging iOS simulator issues and UI problems   |
 
 ### TypeScript
 
@@ -66,24 +72,30 @@ Custom agents, skills, and commands for software development workflows.
 | --------------------------- | --------------------------------------------------------------------- |
 | `typescript-best-practices` | Schema-first development, strict typing, functional patterns, and Zod |
 
+### Life
+
+| Skill        | Description                                                                     |
+| ------------ | ------------------------------------------------------------------------------- |
+| `gps-method` | Evidence-based goal achievement framework using Goal, Plan, and System methodology |
+
 ### System Design
 
 No standalone skills; see the `mermaid-generator` agent below.
 
 ### Product Management
 
-No standalone skills; see `prd-creator` and `status-updates` below.
+| Skill            | Description                                                                 |
+| ---------------- | --------------------------------------------------------------------------- |
+| `status-updates` | Team updates and stakeholder comms with scannable structure and honest tone |
 
 ## Agents
 
 | Agent               | Plugin             | Description                                                                                                             |
 | ------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------- |
 | `compare-branch`    | core               | Branch comparison code review agent for structured findings across functionality, security, performance, and edge cases |
-| `prompt-master`     | core               | Prompt refinement agent that expands prompts into XML-tagged, structured instructions                                   |
 | `refactor`          | core               | Refactoring coach to assess and guide meaningful abstractions after tests are green                                     |
 | `mermaid-generator` | system-design      | Generates Mermaid diagrams from code to visualize architecture and flows                                                |
 | `prd-creator`       | product-management | Builds complete PRDs with structure, requirements, risks, and success criteria                                          |
-| `status-updates`    | product-management | Crafts two-week status updates with audience-aware tone, risks, and impact                                              |
 
 ## Commands
 

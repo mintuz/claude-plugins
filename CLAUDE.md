@@ -4,14 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Claude Code plugin marketplace containing six plugins for software development workflows:
+Claude Code plugin marketplace containing seven plugins for software development and personal productivity workflows:
 
-- core – memory, commit hygiene, refactoring, prompt refinement, and branch review
-- web – CSS, React, testing, refactoring, and design practices
-- typescript – strict, schema-first TypeScript guidance
-- system-design – Mermaid diagram generation from code
-- product-management – PRD creation and status updates
-- app – Swift iOS testing and App Intent-first workflows
+- **core** – memory, commit hygiene, refactoring, prompt refinement, and branch review
+- **web** – CSS, React, Tailwind, testing, refactoring, and design practices
+- **typescript** – strict, schema-first TypeScript guidance
+- **system-design** – Mermaid diagram generation from code
+- **product-management** – PRD creation, status updates, and task orchestration
+- **app** – Swift iOS testing, App Intent-first development, and SwiftUI architecture
+- **life** – personal life management with GPS method for goal achievement
+
+## Plugin Architecture
+
+Plugins extend Claude Code with three types of content:
+
+1. **Agents** - Autonomous subprocesses with specialized tools and context (defined in `agents/*.md`)
+2. **Skills** - Knowledge bases that load into context (defined in `skills/*/SKILL.md`)
+3. **Commands** - Slash commands for quick actions (defined in `commands/*.md`)
+
+The marketplace registry (`.claude-plugin/marketplace.json`) indexes all plugins, while each plugin's manifest (`plugin.json`) defines metadata. Skills listed in marketplace.json become user-invocable (e.g., `/skill core:commit-messages`), while unlisted skills are only loaded by other skills or agents.
 
 ## Repository Structure
 
@@ -104,12 +115,13 @@ Knowledge base content...
 
 ## Available Content Snapshot
 
-- **core:** agents `compare-branch`, `prompt-master`, `refactor`; commands `@init`, `/remember`, `/recall`; skills `commit-messages`, `expectations`, `learn`, `pr`, `writing`
-- **web:** skills `css`, `frontend-testing`, `react`, `react-testing`, `refactoring`, `tdd`, `web-design`
+- **core:** agents `compare-branch`, `prompt-master`, `refactor`; commands `@init`, `/remember`, `/recall`; skills `commit-messages`, `expectations`, `learn`, `pr`, `writing`, `prompt-master`
+- **web:** skills `css`, `frontend-testing`, `react`, `react-testing`, `refactoring`, `tdd`, `web-design`, `tailwind`, `eyes`, `chatgpt-app-sdk`
 - **typescript:** skill `typescript-best-practices`
 - **system-design:** agent `mermaid-generator`
-- **product-management:** agents `prd-creator`, `status-updates`
-- **app:** skills `app-intent-driven-development`, `swift-testing`
+- **product-management:** agents `prd-creator`, `status-updates`; skill `status-updates`
+- **app:** skills `app-intent-driven-development`, `swift-testing`, `swiftui-architecture`, `debug`
+- **life:** skill `gps-method`
 
 ## Adding New Content
 
@@ -120,10 +132,48 @@ Knowledge base content...
 **New Command:** Create `.md` in `plugins/[plugin]/commands/`
 
 **New Plugin:**
-1. Create `plugins/[plugin-name]/.claude-plugin/plugin.json`
-2. Add entry to `.claude-plugin/marketplace.json` (include skills array if applicable)
+1. Create `plugins/[plugin-name]/.claude-plugin/plugin.json` with name, version, description, author, repository, license, keywords
+2. Add entry to `.claude-plugin/marketplace.json`:
+   ```json
+   {
+     "name": "plugin-name",
+     "source": "./plugins/plugin-name",
+     "description": "...",
+     "skills": ["./plugins/plugin-name/skills/skill-name"]  // Optional, only for user-invocable skills
+   }
+   ```
 3. Create `agents/`, `skills/`, and/or `commands/` directories as needed
+4. Add `.mcp.json` if the plugin requires MCP servers
 
 ## Version Bumping
 
 Increment `version` in the relevant `plugin.json` following semver when updating plugins.
+
+## MCP Server Integrations
+
+Some plugins include MCP server configurations in `.mcp.json`:
+
+- **core** - Memory MCP (`@modelcontextprotocol/server-memory`) for persistent knowledge storage via `/remember` and `/recall`
+- **product-management** - Task Master AI MCP for task orchestration workflows
+
+These servers auto-load when the plugin is active.
+
+## Skill Cross-References
+
+Skills can reference other skills as prerequisites. For example:
+- `web:tailwind` loads `web:css`, `web:react`, `typescript:skills`, and `web:web-design`
+- `app:swiftui-architecture` works alongside `app:swift-testing` and `app:app-intent-driven-development`
+
+When creating skills that build on others, include a "Prerequisites" section at the top.
+
+## Description Naming Convention
+
+Use the **WHEN/NOT** pattern for skill and agent descriptions:
+
+```
+WHEN [trigger condition]; NOT [exclusion]; [output or behavior]
+```
+
+Examples:
+- `WHEN writing git/conventional commits; NOT for PR text; returns concise, why-first commit lines`
+- `WHEN building SwiftUI views; NOT for UIKit or legacy patterns; provides pure SwiftUI data flow`
