@@ -51,6 +51,7 @@ func main() {
 	dryRun := flag.Bool("dry-run", false, "Perform a dry run without copying files")
 	projectLevel := flag.Bool("project", false, "Install to .codex/skills in current directory instead of ~/.codex/skills")
 	usePrefix := flag.Bool("prefix", false, "Prefix skill names with plugin name (e.g., core-commit-messages)")
+	useCopy := flag.Bool("copy", false, "Copy files instead of creating symlinks")
 	flag.Parse()
 
 	// Determine output directory
@@ -77,8 +78,13 @@ func main() {
 	printHeader("Codex Skills Sync")
 	fmt.Printf("%sTarget directory:%s %s\n", colorBlue, colorReset, absTargetDir)
 	fmt.Printf("%sPlugins directory:%s %s\n", colorBlue, colorReset, *pluginsDir)
+	if *useCopy {
+		fmt.Printf("%sMode:%s Copy files\n", colorBlue, colorReset)
+	} else {
+		fmt.Printf("%sMode:%s Symlink\n", colorBlue, colorReset)
+	}
 	if *dryRun {
-		fmt.Printf("%sDry run mode: No files will be copied%s\n", colorYellow, colorReset)
+		fmt.Printf("%sDry run mode: No files will be modified%s\n", colorYellow, colorReset)
 	}
 	fmt.Println()
 
@@ -91,7 +97,7 @@ func main() {
 	// Sync skills
 	stats := &SyncStats{}
 	for _, plugin := range marketplace.Plugins {
-		syncPlugin(plugin, absTargetDir, *verbose, *dryRun, *usePrefix, stats)
+		syncPlugin(plugin, absTargetDir, *verbose, *dryRun, *usePrefix, *useCopy, stats)
 	}
 
 	// Print summary
@@ -112,7 +118,7 @@ func readMarketplace(path string) (*MarketplaceConfig, error) {
 	return &config, nil
 }
 
-func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, usePrefix bool, stats *SyncStats) {
+func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, usePrefix bool, useCopy bool, stats *SyncStats) {
 	if len(plugin.Skills) == 0 {
 		if verbose {
 			fmt.Printf("%s[SKIP]%s Plugin '%s' has no skills\n", colorYellow, colorReset, plugin.Name)
@@ -123,7 +129,7 @@ func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, useP
 	fmt.Printf("\n%s=== Syncing plugin: %s ===%s\n", colorBlue, plugin.Name, colorReset)
 
 	for _, skillPath := range plugin.Skills {
-		if err := syncSkill(plugin.Name, skillPath, targetDir, verbose, dryRun, usePrefix, stats); err != nil {
+		if err := syncSkill(plugin.Name, skillPath, targetDir, verbose, dryRun, usePrefix, useCopy, stats); err != nil {
 			fmt.Printf("%s[ERROR]%s Failed to sync %s: %v\n", colorRed, colorReset, skillPath, err)
 			stats.SkillsFailed++
 		} else {
@@ -132,7 +138,7 @@ func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, useP
 	}
 }
 
-func syncSkill(pluginName, skillPath, targetDir string, verbose bool, dryRun bool, usePrefix bool, stats *SyncStats) error {
+func syncSkill(pluginName, skillPath, targetDir string, verbose bool, dryRun bool, usePrefix bool, useCopy bool, stats *SyncStats) error {
 	// Extract skill name from path (e.g., "./plugins/core/skills/commit-messages" -> "commit-messages")
 	skillName := filepath.Base(skillPath)
 
@@ -168,55 +174,84 @@ func syncSkill(pluginName, skillPath, targetDir string, verbose bool, dryRun boo
 	}
 
 	if dryRun {
-		fmt.Printf("%s[DRY RUN]%s Would sync: %s\n", colorYellow, colorReset, codexSkillName)
+		if useCopy {
+			fmt.Printf("%s[DRY RUN]%s Would copy: %s\n", colorYellow, colorReset, codexSkillName)
+		} else {
+			fmt.Printf("%s[DRY RUN]%s Would symlink: %s\n", colorYellow, colorReset, codexSkillName)
+		}
 		return nil
 	}
 
-	// Create destination directory
-	if err := os.MkdirAll(dstDir, 0755); err != nil {
-		return fmt.Errorf("failed to create destination directory: %w", err)
+	// Remove existing destination if it exists
+	if _, err := os.Lstat(dstDir); err == nil {
+		if err := os.RemoveAll(dstDir); err != nil {
+			return fmt.Errorf("failed to remove existing destination: %w", err)
+		}
 	}
 
-	// Copy all files from source to destination
-	fileCount := 0
-	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+	// Ensure parent directory exists
+	parentDir := filepath.Dir(dstDir)
+	if err := os.MkdirAll(parentDir, 0755); err != nil {
+		return fmt.Errorf("failed to create parent directory: %w", err)
+	}
+
+	if useCopy {
+		// Copy mode: recursively copy all files
+		if err := os.MkdirAll(dstDir, 0755); err != nil {
+			return fmt.Errorf("failed to create destination directory: %w", err)
+		}
+
+		fileCount := 0
+		err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			// Get relative path from source directory
+			relPath, err := filepath.Rel(srcDir, path)
+			if err != nil {
+				return err
+			}
+
+			// Destination path
+			destPath := filepath.Join(dstDir, relPath)
+
+			// If it's a directory, create it
+			if info.IsDir() {
+				return os.MkdirAll(destPath, info.Mode())
+			}
+
+			// Copy file
+			if err := copyFile(path, destPath); err != nil {
+				return fmt.Errorf("failed to copy %s: %w", relPath, err)
+			}
+
+			fileCount++
+			if verbose {
+				fmt.Printf("    %s✓%s Copied: %s\n", colorGreen, colorReset, relPath)
+			}
+
+			return nil
+		})
+
 		if err != nil {
 			return err
 		}
 
-		// Get relative path from source directory
-		relPath, err := filepath.Rel(srcDir, path)
-		if err != nil {
-			return err
+		stats.FilesCreated += fileCount
+		fmt.Printf("%s[SYNCED]%s %s (%d files copied)\n", colorGreen, colorReset, codexSkillName, fileCount)
+	} else {
+		// Symlink mode: create a symlink to the source directory
+		if err := os.Symlink(srcDir, dstDir); err != nil {
+			return fmt.Errorf("failed to create symlink: %w", err)
 		}
 
-		// Destination path
-		destPath := filepath.Join(dstDir, relPath)
-
-		// If it's a directory, create it
-		if info.IsDir() {
-			return os.MkdirAll(destPath, info.Mode())
-		}
-
-		// Copy file
-		if err := copyFile(path, destPath); err != nil {
-			return fmt.Errorf("failed to copy %s: %w", relPath, err)
-		}
-
-		fileCount++
 		if verbose {
-			fmt.Printf("    %s✓%s Copied: %s\n", colorGreen, colorReset, relPath)
+			fmt.Printf("    %s✓%s Symlinked to: %s\n", colorGreen, colorReset, srcDir)
 		}
 
-		return nil
-	})
-
-	if err != nil {
-		return err
+		fmt.Printf("%s[SYNCED]%s %s (symlinked)\n", colorGreen, colorReset, codexSkillName)
 	}
-
-	stats.FilesCreated += fileCount
-	fmt.Printf("%s[SYNCED]%s %s (%d files)\n", colorGreen, colorReset, codexSkillName, fileCount)
 
 	return nil
 }

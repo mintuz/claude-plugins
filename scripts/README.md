@@ -9,11 +9,14 @@ The `sync-to-codex.go` script converts and copies skills from the Claude plugin 
 ## Quick Start
 
 ```bash
-# Sync all skills to ~/.codex/skills (user-level install)
+# Sync all skills to ~/.codex/skills (user-level, symlink mode)
 go run sync-to-codex.go
 
-# Sync to .codex/skills in current project (project-level install)
+# Sync to .codex/skills in current project (project-level)
 go run sync-to-codex.go --project
+
+# Use copy mode instead of symlinks
+go run sync-to-codex.go --copy
 
 # Dry run to see what would be synced
 go run sync-to-codex.go --dry-run --verbose
@@ -49,18 +52,21 @@ sync-to-codex [flags]
 | `--marketplace <file>` | Path to marketplace.json | `./.claude-plugin/marketplace.json` |
 | `--project` | Install to `.codex/skills` in current directory | `false` |
 | `--prefix` | Prefix skill names with plugin name | `false` |
+| `--copy` | Copy files instead of creating symlinks | `false` |
 | `--verbose` | Enable verbose logging | `false` |
-| `--dry-run` | Show what would be synced without copying | `false` |
+| `--dry-run` | Show what would be synced without modifying files | `false` |
 
 ## Examples
 
 ### User-level installation (default)
 
-Installs skills to `~/.codex/skills` for all your Codex sessions:
+Installs skills to `~/.codex/skills` for all your Codex sessions using symlinks:
 
 ```bash
 go run sync-to-codex.go
 ```
+
+This creates symlinks, so changes to your Claude skills automatically reflect in Codex.
 
 ### Project-level installation
 
@@ -69,6 +75,19 @@ Installs skills to `.codex/skills` in the current repository:
 ```bash
 go run sync-to-codex.go --project
 ```
+
+### Copy mode (independent files)
+
+Use `--copy` to copy files instead of symlinking:
+
+```bash
+go run sync-to-codex.go --copy
+```
+
+Use this when:
+- You want to distribute skills independently
+- You're on a filesystem that doesn't support symlinks
+- You want to prevent changes to source skills from affecting Codex
 
 ### Custom output directory
 
@@ -95,8 +114,24 @@ go run sync-to-codex.go --marketplace /path/to/marketplace.json
 1. **Reads marketplace.json** - Discovers all plugins and their skills
 2. **Finds skill directories** - Locates each skill's SKILL.md and supporting files
 3. **Creates flat structure** - Skills use their original names (e.g., `commit-messages`, `react`) or prefixed names with `--prefix` flag
-4. **Copies all files** - Includes SKILL.md, reference files, scripts, and other assets
+4. **Symlinks by default** - Creates symlinks to skill directories (use `--copy` to copy files instead)
 5. **Maintains structure** - Preserves directory structure within each skill folder
+
+### Symlink vs Copy Mode
+
+**Symlink mode (default):**
+- ✅ Changes to skills automatically reflected in Codex
+- ✅ Minimal disk space usage
+- ✅ Instant sync
+- ❌ Breaks if source repo is moved/deleted
+- ❌ May not work on all filesystems (e.g., some Windows setups)
+
+**Copy mode (`--copy` flag):**
+- ✅ Independent files that won't break
+- ✅ Works on all filesystems
+- ❌ Changes require re-running sync
+- ❌ Uses more disk space
+- ❌ Duplicate files to maintain
 
 ## Skill Naming Convention
 
@@ -131,13 +166,15 @@ $app-swift-testing
 
 ## Supported Skill Features
 
-The sync tool preserves all skill features:
+The sync tool preserves all skill features (in both symlink and copy modes):
 
 - ✅ SKILL.md with YAML frontmatter
 - ✅ Reference documentation files
 - ✅ Scripts and executables
 - ✅ Resource files and assets
 - ✅ Nested directory structures
+
+**Note:** In symlink mode, the entire skill directory is linked, so all files are automatically available.
 
 ## Skills Synced
 
