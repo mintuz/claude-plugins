@@ -48,6 +48,7 @@ sync-to-codex [flags]
 | `--plugins <dir>` | Directory containing Claude plugins | `./plugins` |
 | `--marketplace <file>` | Path to marketplace.json | `./.claude-plugin/marketplace.json` |
 | `--project` | Install to `.codex/skills` in current directory | `false` |
+| `--prefix` | Prefix skill names with plugin name | `false` |
 | `--verbose` | Enable verbose logging | `false` |
 | `--dry-run` | Show what would be synced without copying | `false` |
 
@@ -93,27 +94,36 @@ go run sync-to-codex.go --marketplace /path/to/marketplace.json
 
 1. **Reads marketplace.json** - Discovers all plugins and their skills
 2. **Finds skill directories** - Locates each skill's SKILL.md and supporting files
-3. **Creates Codex-compatible structure** - Skills are renamed with plugin prefix (e.g., `core-commit-messages`)
+3. **Creates flat structure** - Skills use their original names (e.g., `commit-messages`, `react`) or prefixed names with `--prefix` flag
 4. **Copies all files** - Includes SKILL.md, reference files, scripts, and other assets
 5. **Maintains structure** - Preserves directory structure within each skill folder
 
 ## Skill Naming Convention
 
-Claude plugin skills are namespaced with their plugin name when synced to Codex:
+By default, skills are synced with their original names (flattened structure without plugin prefix):
 
-| Claude Plugin Skill | Codex Skill Name |
-|---------------------|------------------|
-| `core:commit-messages` | `core-commit-messages` |
-| `web:react` | `web-react` |
-| `app:swift-testing` | `app-swift-testing` |
+| Claude Plugin Skill | Codex Skill Name (default) | With `--prefix` flag |
+|---------------------|----------------------------|---------------------|
+| `core:commit-messages` | `commit-messages` | `core-commit-messages` |
+| `web:react` | `react` | `web-react` |
+| `app:swift-testing` | `swift-testing` | `app-swift-testing` |
+
+**Note:** All skill names are unique across plugins, so no conflicts occur with the flattened structure.
 
 ## Using Synced Skills in Codex
 
 After syncing, you can use skills in Codex CLI:
 
 ```bash
-# Invoke a skill explicitly
+# Invoke a skill explicitly (using default flattened names)
+$commit-messages
+$react
+$swift-testing
+
+# Or with --prefix flag enabled
 $core-commit-messages
+$web-react
+$app-swift-testing
 
 # Let Codex auto-select based on context
 # Just describe what you need and Codex will use the appropriate skill
@@ -131,37 +141,39 @@ The sync tool preserves all skill features:
 
 ## Skills Synced
 
-Based on the current marketplace configuration, the following skills will be synced:
+Based on the current marketplace configuration, the following skills will be synced (shown with default flattened names):
 
 ### Core Plugin
-- `core-commit-messages` - Git/conventional commit message guidance
-- `core-expectations` - Software engineering expectations and standards
-- `core-learn` - Learning and knowledge building
-- `core-pr` - Pull request creation and review
-- `core-writing` - Technical writing guidance
-- `core-prompt-master` - Prompt refinement and optimization
+- `commit-messages` - Git/conventional commit message guidance
+- `expectations` - Software engineering expectations and standards
+- `learn` - Learning and knowledge building
+- `pr` - Pull request creation and review
+- `writing` - Technical writing guidance
+- `prompt-master` - Prompt refinement and optimization
 
 ### Web Plugin
-- `web-css` - CSS best practices and modern patterns
-- `web-tdd` - Test-driven development for web apps
-- `web-react` - React architecture and patterns
-- `web-react-testing` - React testing strategies
-- `web-frontend-testing` - Frontend testing approaches
-- `web-web-design` - Web design principles
-- `web-eyes` - Visual design and UI review
-- `web-chatgpt-app-sdk` - ChatGPT app SDK integration
+- `css` - CSS best practices and modern patterns
+- `tdd` - Test-driven development for web apps
+- `react` - React architecture and patterns
+- `react-testing` - React testing strategies
+- `frontend-testing` - Frontend testing approaches
+- `web-design` - Web design principles
+- `eyes` - Visual design and UI review
+- `chatgpt-app-sdk` - ChatGPT app SDK integration
 
 ### App Plugin
-- `app-swift-testing` - Swift testing with Swift Testing framework
-- `app-app-intent-driven-development` - App Intent-first iOS development
-- `app-swiftui-architecture` - SwiftUI architecture patterns
-- `app-debug` - iOS debugging techniques
+- `swift-testing` - Swift testing with Swift Testing framework
+- `app-intent-driven-development` - App Intent-first iOS development
+- `swiftui-architecture` - SwiftUI architecture patterns
+- `debug` - iOS debugging techniques
 
 ### Product Management Plugin
-- `product-management-status-updates` - Status update creation and formatting
+- `status-updates` - Status update creation and formatting
 
 ### Life Plugin
-- `life-gps-method` - Personal goal achievement methodology
+- `gps-method` - Personal goal achievement methodology
+
+**Note:** Use the `--prefix` flag to add plugin prefixes (e.g., `core-commit-messages` instead of `commit-messages`)
 
 ## Troubleshooting
 

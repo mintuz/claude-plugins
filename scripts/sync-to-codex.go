@@ -50,6 +50,7 @@ func main() {
 	verbose := flag.Bool("verbose", false, "Enable verbose logging")
 	dryRun := flag.Bool("dry-run", false, "Perform a dry run without copying files")
 	projectLevel := flag.Bool("project", false, "Install to .codex/skills in current directory instead of ~/.codex/skills")
+	usePrefix := flag.Bool("prefix", false, "Prefix skill names with plugin name (e.g., core-commit-messages)")
 	flag.Parse()
 
 	// Determine output directory
@@ -90,7 +91,7 @@ func main() {
 	// Sync skills
 	stats := &SyncStats{}
 	for _, plugin := range marketplace.Plugins {
-		syncPlugin(plugin, absTargetDir, *verbose, *dryRun, stats)
+		syncPlugin(plugin, absTargetDir, *verbose, *dryRun, *usePrefix, stats)
 	}
 
 	// Print summary
@@ -111,7 +112,7 @@ func readMarketplace(path string) (*MarketplaceConfig, error) {
 	return &config, nil
 }
 
-func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, stats *SyncStats) {
+func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, usePrefix bool, stats *SyncStats) {
 	if len(plugin.Skills) == 0 {
 		if verbose {
 			fmt.Printf("%s[SKIP]%s Plugin '%s' has no skills\n", colorYellow, colorReset, plugin.Name)
@@ -122,7 +123,7 @@ func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, stat
 	fmt.Printf("\n%s=== Syncing plugin: %s ===%s\n", colorBlue, plugin.Name, colorReset)
 
 	for _, skillPath := range plugin.Skills {
-		if err := syncSkill(plugin.Name, skillPath, targetDir, verbose, dryRun, stats); err != nil {
+		if err := syncSkill(plugin.Name, skillPath, targetDir, verbose, dryRun, usePrefix, stats); err != nil {
 			fmt.Printf("%s[ERROR]%s Failed to sync %s: %v\n", colorRed, colorReset, skillPath, err)
 			stats.SkillsFailed++
 		} else {
@@ -131,12 +132,17 @@ func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, stat
 	}
 }
 
-func syncSkill(pluginName, skillPath, targetDir string, verbose bool, dryRun bool, stats *SyncStats) error {
+func syncSkill(pluginName, skillPath, targetDir string, verbose bool, dryRun bool, usePrefix bool, stats *SyncStats) error {
 	// Extract skill name from path (e.g., "./plugins/core/skills/commit-messages" -> "commit-messages")
 	skillName := filepath.Base(skillPath)
 
-	// Create Codex skill name with plugin prefix (e.g., "core-commit-messages")
-	codexSkillName := fmt.Sprintf("%s-%s", pluginName, skillName)
+	// Create Codex skill name (with optional plugin prefix)
+	var codexSkillName string
+	if usePrefix {
+		codexSkillName = fmt.Sprintf("%s-%s", pluginName, skillName)
+	} else {
+		codexSkillName = skillName
+	}
 
 	// Source and destination paths
 	srcDir, err := filepath.Abs(skillPath)
@@ -271,7 +277,7 @@ func printSummary(stats *SyncStats, dryRun bool) {
 	if stats.SkillsSynced > 0 && !dryRun {
 		fmt.Printf("%s✓ Successfully synced skills to Codex!%s\n\n", colorGreen, colorReset)
 		fmt.Printf("You can now use these skills in Codex by typing $<skill-name>\n")
-		fmt.Printf("Example: $core-commit-messages\n\n")
+		fmt.Printf("Example: $commit-messages or $react\n\n")
 	}
 }
 
