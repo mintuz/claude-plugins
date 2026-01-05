@@ -44,18 +44,18 @@ Custom agents, skills, and commands for software development workflows.
 
 ### Web
 
-| Skill              | Description                                                                  |
-| ------------------ | ---------------------------------------------------------------------------- |
-| `css`              | CSS best practices for maintainable, scalable styles                        |
-| `react`            | Production-ready React architecture and patterns                             |
-| `react-testing`    | React Testing Library patterns for components, hooks, and context            |
-| `frontend-testing` | DOM Testing Library patterns for behavior-driven UI testing                  |
-| `tdd`              | Test-Driven Development principles and Red-Green-Refactor workflow           |
-| `refactoring`      | Refactoring assessment and patterns after tests pass                         |
-| `web-design`       | Visual hierarchy, spacing, typography, and UI polish                         |
-| `tailwind`         | Design systems with Tailwind CSS, design tokens, and component libraries     |
-| `eyes`             | Visual feedback loop with Playwright screenshots for UI iteration            |
-| `chatgpt-app-sdk`  | Build ChatGPT apps using OpenAI Apps SDK and MCP with conversational UX      |
+| Skill              | Description                                                              |
+| ------------------ | ------------------------------------------------------------------------ |
+| `css`              | CSS best practices for maintainable, scalable styles                     |
+| `react`            | Production-ready React architecture and patterns                         |
+| `react-testing`    | React Testing Library patterns for components, hooks, and context        |
+| `frontend-testing` | DOM Testing Library patterns for behavior-driven UI testing              |
+| `tdd`              | Test-Driven Development principles and Red-Green-Refactor workflow       |
+| `refactoring`      | Refactoring assessment and patterns after tests pass                     |
+| `web-design`       | Visual hierarchy, spacing, typography, and UI polish                     |
+| `tailwind`         | Design systems with Tailwind CSS, design tokens, and component libraries |
+| `eyes`             | Visual feedback loop with Playwright screenshots for UI iteration        |
+| `chatgpt-app-sdk`  | Build ChatGPT apps using OpenAI Apps SDK and MCP with conversational UX  |
 
 ### App
 
@@ -74,8 +74,8 @@ Custom agents, skills, and commands for software development workflows.
 
 ### Life
 
-| Skill        | Description                                                                     |
-| ------------ | ------------------------------------------------------------------------------- |
+| Skill        | Description                                                                        |
+| ------------ | ---------------------------------------------------------------------------------- |
 | `gps-method` | Evidence-based goal achievement framework using Goal, Plan, and System methodology |
 
 ### System Design
@@ -116,3 +116,4 @@ Some plugins include MCP server configurations:
 
 - [City Paul's dotfiles](https://github.com/citypaul/.dotfiles/tree/main/claude/.claude)
 - [Lee Cheneler's dotfiles](https://github.com/LeeCheneler/dotfiles)
+- [Thomas Ricouard's Skills](https://github.com/Dimillian/Skills)
