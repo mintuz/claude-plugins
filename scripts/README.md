@@ -15,24 +15,24 @@ This directory contains two main tools:
 
 ## Package Skills for Claude Web
 
-The `package-skills.go` script creates a zip file containing all skills from the marketplace in a flat folder structure, ready to upload to the Claude web interface at claude.ai.
+The `package-skills.go` script creates individual zip files for each skill from the marketplace, ready to upload to the Claude web interface at claude.ai.
 
 ### Why Use This?
 
-Upload the packaged skills to Claude web to access all plugin skills directly in your browser sessions without needing Claude Code CLI.
+Upload the packaged skills to Claude web to access all plugin skills directly in your browser sessions without needing Claude Code CLI. Each skill is packaged as a separate zip file that can be uploaded independently.
 
 ### Quick Start
 
 Run these commands from the repository root:
 
 ```bash
-# Create a timestamped zip file (e.g., claude-plugins-skills-20260105-143022.zip)
+# Create individual zip files in .dist directory (default)
 go run scripts/package-skills.go
 
-# Create a custom-named zip file
-go run scripts/package-skills.go --output my-skills.zip
+# Create zip files in a custom directory
+go run scripts/package-skills.go --output ~/my-skills
 
-# Validate skills without creating zip (dry run)
+# Validate skills without creating zip files (dry run)
 go run scripts/package-skills.go --dry-run --verbose
 ```
 
@@ -46,32 +46,32 @@ go run scripts/package-skills.go [flags]
 
 | Flag                   | Description                                      | Default                             |
 | ---------------------- | ------------------------------------------------ | ----------------------------------- |
-| `--output <file>`      | Output zip file path                             | Timestamped filename                |
+| `--output <dir>`       | Output directory for skill zip files             | `.dist`                             |
 | `--marketplace <file>` | Path to marketplace.json                         | `./.claude-plugin/marketplace.json` |
 | `--prefix`             | Prefix skill names with plugin name              | `false`                             |
 | `--verbose`            | Enable verbose logging                           | `false`                             |
-| `--dry-run`            | Validate without creating zip file               | `false`                             |
+| `--dry-run`            | Validate without creating zip files              | `false`                             |
 
 ### Examples
 
-#### Create timestamped zip file (default)
+#### Create zip files in default .dist directory
 
 ```bash
 go run scripts/package-skills.go
-# Creates: claude-plugins-skills-20260105-143022.zip
+# Creates: .dist/commit-messages.zip, .dist/react.zip, etc.
 ```
 
-#### Create custom-named zip file
+#### Create zip files in custom directory
 
 ```bash
-go run scripts/package-skills.go --output claude-skills.zip
+go run scripts/package-skills.go --output ~/Downloads/claude-skills
 ```
 
 #### Prefix skill names with plugin name
 
 ```bash
 go run scripts/package-skills.go --prefix
-# Skills named: core-commit-messages, web-react, app-swift-testing, etc.
+# Creates: .dist/core-commit-messages.zip, .dist/web-react.zip, .dist/app-swift-testing.zip, etc.
 ```
 
 #### Verbose dry run
@@ -84,16 +84,16 @@ go run scripts/package-skills.go --dry-run --verbose
 
 1. **Reads marketplace.json** - Discovers all plugins and their skills
 2. **Validates skills** - Ensures each skill has required SKILL.md file
-3. **Creates flat structure** - All skills at zip root with optional plugin prefix
-4. **Packages files** - Recursively adds all skill files to zip
-5. **Reports statistics** - Shows skills packaged, files added, and final size
+3. **Creates individual zips** - Each skill packaged in its own zip file with optional plugin prefix
+4. **Packages files** - Recursively adds all skill files to each zip
+5. **Reports statistics** - Shows skills packaged, files added, and zip files created
 
 ### Using Packaged Skills
 
-1. Run the script to create a zip file
+1. Run the script to create individual zip files in the `.dist` directory
 2. Visit claude.ai
-3. Upload the zip file in the skills section
-4. Access all skills in your web conversations
+3. Upload each zip file individually in the skills section
+4. Access the skills in your web conversations
 
 ---
 
@@ -308,7 +308,7 @@ cat .claude-plugin/marketplace.json | grep -A 5 "skills"
 
 ### Package Skills Issues
 
-#### "Permission denied" when creating zip file
+#### "Permission denied" when creating zip files
 
 Ensure you have write permissions to the output directory:
 
@@ -317,16 +317,20 @@ Ensure you have write permissions to the output directory:
 ls -la .
 
 # Or specify a directory where you have write access
-go run scripts/package-skills.go --output ~/Downloads/claude-skills.zip
+go run scripts/package-skills.go --output ~/Downloads/claude-skills
 ```
 
-#### Zip file is empty or incomplete
+#### Zip files are empty or incomplete
 
 Run with verbose flag to see what's being packaged:
 
 ```bash
 go run scripts/package-skills.go --dry-run --verbose
 ```
+
+#### Output directory not created
+
+The script automatically creates the output directory if it doesn't exist. If you see errors, ensure the parent directory exists and you have write permissions.
 
 ### Codex Sync Issues
 

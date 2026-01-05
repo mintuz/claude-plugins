@@ -112,6 +112,34 @@ Some plugins include MCP server configurations:
 - **core** - Memory MCP for persistent knowledge storage across sessions
 - **product-management** - Task Master MCP for task management workflows
 
+## Using Skills with Claude Web
+
+The `.dist` folder contains individual skill zip files ready for upload to Claude web (claude.ai). Each skill is packaged as a separate zip file that can be uploaded independently to the skills section in your Claude web conversations.
+
+### Generating Skill Zips
+
+Run the packaging script from the repository root:
+
+```bash
+# Create individual skill zips in .dist directory
+go run scripts/package-skills.go
+
+# This creates files like:
+# .dist/commit-messages.zip
+# .dist/react.zip
+# .dist/swift-testing.zip
+# etc.
+```
+
+### Uploading to Claude Web
+
+1. Visit [claude.ai](https://claude.ai)
+2. Navigate to the skills section
+3. Upload the individual zip files from `.dist`
+4. Access the skills in your web conversations
+
+See [scripts/README.md](scripts/README.md) for more options including custom output directories and skill name prefixing.
+
 ## Credits
 
 - [City Paul's dotfiles](https://github.com/citypaul/.dotfiles/tree/main/claude/.claude)
