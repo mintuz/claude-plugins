@@ -8,7 +8,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 const (
@@ -46,29 +45,22 @@ type PackageStats struct {
 
 func main() {
 	// Parse command-line flags
-	outputFile := flag.String("output", "", "Output zip file path (default: claude-plugins-skills.zip)")
+	outputDir := flag.String("output", ".dist", "Output directory for skill zip files")
 	marketplaceFile := flag.String("marketplace", "./.claude-plugin/marketplace.json", "Path to marketplace.json")
 	verbose := flag.Bool("verbose", false, "Enable verbose logging")
-	dryRun := flag.Bool("dry-run", false, "Perform a dry run without creating zip file")
+	dryRun := flag.Bool("dry-run", false, "Perform a dry run without creating zip files")
 	usePrefix := flag.Bool("prefix", false, "Prefix skill names with plugin name (e.g., core-commit-messages)")
 	flag.Parse()
 
-	// Determine output file path
-	zipPath := *outputFile
-	if zipPath == "" {
-		timestamp := time.Now().Format("20060102-150405")
-		zipPath = fmt.Sprintf("claude-plugins-skills-%s.zip", timestamp)
-	}
-
 	// Convert to absolute path
-	absZipPath, err := filepath.Abs(zipPath)
+	absOutputDir, err := filepath.Abs(*outputDir)
 	if err != nil {
 		fatal("Failed to resolve output path: %v", err)
 	}
 
 	// Print configuration
-	printHeader("Package Skills to Zip")
-	fmt.Printf("%sOutput file:%s %s\n", colorBlue, colorReset, absZipPath)
+	printHeader("Package Skills to Zip Files")
+	fmt.Printf("%sOutput directory:%s %s\n", colorBlue, colorReset, absOutputDir)
 	if *dryRun {
 		fmt.Printf("%sDry run mode: No files will be created%s\n", colorYellow, colorReset)
 	}
@@ -80,11 +72,14 @@ func main() {
 		fatal("Failed to read marketplace.json: %v", err)
 	}
 
-	// Create zip file
+	// Create output directory
 	stats := &PackageStats{}
 	if !*dryRun {
-		if err := createSkillsZip(absZipPath, marketplace, *verbose, *usePrefix, stats); err != nil {
-			fatal("Failed to create zip file: %v", err)
+		if err := os.MkdirAll(absOutputDir, 0755); err != nil {
+			fatal("Failed to create output directory: %v", err)
+		}
+		if err := createSkillZips(absOutputDir, marketplace, *verbose, *usePrefix, stats); err != nil {
+			fatal("Failed to create zip files: %v", err)
 		}
 	} else {
 		// Dry run - just validate skills
@@ -94,7 +89,7 @@ func main() {
 	}
 
 	// Print summary
-	printSummary(stats, absZipPath, *dryRun)
+	printSummary(stats, absOutputDir, *dryRun)
 }
 
 func readMarketplace(path string) (*MarketplaceConfig, error) {
@@ -111,20 +106,10 @@ func readMarketplace(path string) (*MarketplaceConfig, error) {
 	return &config, nil
 }
 
-func createSkillsZip(zipPath string, marketplace *MarketplaceConfig, verbose bool, usePrefix bool, stats *PackageStats) error {
-	// Create zip file
-	zipFile, err := os.Create(zipPath)
-	if err != nil {
-		return fmt.Errorf("failed to create zip file: %w", err)
-	}
-	defer zipFile.Close()
-
-	zipWriter := zip.NewWriter(zipFile)
-	defer zipWriter.Close()
-
+func createSkillZips(outputDir string, marketplace *MarketplaceConfig, verbose bool, usePrefix bool, stats *PackageStats) error {
 	// Process each plugin
 	for _, plugin := range marketplace.Plugins {
-		if err := packagePlugin(plugin, zipWriter, verbose, usePrefix, stats); err != nil {
+		if err := packagePluginSkills(plugin, outputDir, verbose, usePrefix, stats); err != nil {
 			fmt.Printf("%s[ERROR]%s Failed to package plugin '%s': %v\n", colorRed, colorReset, plugin.Name, err)
 			return err
 		}
@@ -177,7 +162,7 @@ func validatePlugin(plugin Plugin, verbose bool, usePrefix bool, stats *PackageS
 	}
 }
 
-func packagePlugin(plugin Plugin, zipWriter *zip.Writer, verbose bool, usePrefix bool, stats *PackageStats) error {
+func packagePluginSkills(plugin Plugin, outputDir string, verbose bool, usePrefix bool, stats *PackageStats) error {
 	if len(plugin.Skills) == 0 {
 		if verbose {
 			fmt.Printf("%s[SKIP]%s Plugin '%s' has no skills\n", colorYellow, colorReset, plugin.Name)
@@ -188,7 +173,7 @@ func packagePlugin(plugin Plugin, zipWriter *zip.Writer, verbose bool, usePrefix
 	fmt.Printf("\n%s=== Packaging plugin: %s ===%s\n", colorBlue, plugin.Name, colorReset)
 
 	for _, skillPath := range plugin.Skills {
-		if err := packageSkill(plugin.Name, skillPath, zipWriter, verbose, usePrefix, stats); err != nil {
+		if err := packageSkillToZip(plugin.Name, skillPath, outputDir, verbose, usePrefix, stats); err != nil {
 			fmt.Printf("%s[ERROR]%s Failed to package %s: %v\n", colorRed, colorReset, skillPath, err)
 			stats.SkillsFailed++
 		} else {
@@ -199,7 +184,7 @@ func packagePlugin(plugin Plugin, zipWriter *zip.Writer, verbose bool, usePrefix
 	return nil
 }
 
-func packageSkill(pluginName, skillPath string, zipWriter *zip.Writer, verbose bool, usePrefix bool, stats *PackageStats) error {
+func packageSkillToZip(pluginName, skillPath string, outputDir string, verbose bool, usePrefix bool, stats *PackageStats) error {
 	// Extract skill name from path
 	skillName := filepath.Base(skillPath)
 
@@ -228,8 +213,19 @@ func packageSkill(pluginName, skillPath string, zipWriter *zip.Writer, verbose b
 		return fmt.Errorf("SKILL.md not found in %s", srcDir)
 	}
 
+	// Create individual zip file for this skill
+	zipPath := filepath.Join(outputDir, fmt.Sprintf("%s.zip", packagedName))
+	zipFile, err := os.Create(zipPath)
+	if err != nil {
+		return fmt.Errorf("failed to create zip file: %w", err)
+	}
+	defer zipFile.Close()
+
+	zipWriter := zip.NewWriter(zipFile)
+	defer zipWriter.Close()
+
 	if verbose {
-		fmt.Printf("  Adding %s to zip...\n", packagedName)
+		fmt.Printf("  Creating %s.zip...\n", packagedName)
 	}
 
 	// Add all files from skill directory to zip
@@ -251,16 +247,16 @@ func packageSkill(pluginName, skillPath string, zipWriter *zip.Writer, verbose b
 		}
 
 		// Create path in zip with skill name as root
-		zipPath := filepath.Join(packagedName, relPath)
+		zipEntryPath := filepath.Join(packagedName, relPath)
 
 		// Add file to zip
-		if err := addFileToZip(zipWriter, path, zipPath); err != nil {
+		if err := addFileToZip(zipWriter, path, zipEntryPath); err != nil {
 			return fmt.Errorf("failed to add %s: %w", relPath, err)
 		}
 
 		fileCount++
 		if verbose {
-			fmt.Printf("    %s✓%s Added: %s\n", colorGreen, colorReset, zipPath)
+			fmt.Printf("    %s✓%s Added: %s\n", colorGreen, colorReset, zipEntryPath)
 		}
 
 		return nil
@@ -271,7 +267,7 @@ func packageSkill(pluginName, skillPath string, zipWriter *zip.Writer, verbose b
 	}
 
 	stats.FilesAdded += fileCount
-	fmt.Printf("%s[PACKAGED]%s %s (%d files added)\n", colorGreen, colorReset, packagedName, fileCount)
+	fmt.Printf("%s[PACKAGED]%s %s.zip (%d files added)\n", colorGreen, colorReset, packagedName, fileCount)
 
 	return nil
 }
@@ -322,7 +318,7 @@ func printHeader(title string) {
 	fmt.Println()
 }
 
-func printSummary(stats *PackageStats, zipPath string, dryRun bool) {
+func printSummary(stats *PackageStats, outputDir string, dryRun bool) {
 	fmt.Println()
 	fmt.Printf("%s╔═══════════════════════════════════════════════════════╗%s\n", colorGreen, colorReset)
 	fmt.Printf("%s║%s  %-50s %s║%s\n", colorGreen, colorReset, "Summary", colorGreen, colorReset)
@@ -338,18 +334,13 @@ func printSummary(stats *PackageStats, zipPath string, dryRun bool) {
 	}
 	if !dryRun {
 		fmt.Printf("%sFiles added:%s       %d\n", colorBlue, colorReset, stats.FilesAdded)
+		fmt.Printf("%sZip files created:%s %d\n", colorBlue, colorReset, stats.SkillsPackaged)
 	}
 	fmt.Println()
 
 	if stats.SkillsPackaged > 0 && !dryRun {
-		// Get file size
-		info, err := os.Stat(zipPath)
-		if err == nil {
-			size := float64(info.Size()) / 1024 / 1024 // Convert to MB
-			fmt.Printf("%s✓ Successfully created zip file!%s\n", colorGreen, colorReset)
-			fmt.Printf("  Location: %s\n", zipPath)
-			fmt.Printf("  Size: %.2f MB\n\n", size)
-		}
+		fmt.Printf("%s✓ Successfully created %d zip files!%s\n", colorGreen, stats.SkillsPackaged, colorReset)
+		fmt.Printf("  Location: %s\n\n", outputDir)
 	}
 }
 
