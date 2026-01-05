@@ -1,0 +1,264 @@
+# Claude to Codex Skills Sync
+
+This directory contains tools for syncing Claude plugin skills to OpenAI Codex.
+
+## Overview
+
+The `codex-sync.go` script converts and copies skills from the Claude plugin marketplace to the Codex skills format, making them available for use in OpenAI's Codex CLI.
+
+**IMPORTANT:** This script must be run from the repository root directory, not from within the `scripts/` directory.
+
+## Quick Start
+
+Run these commands from the repository root:
+
+```bash
+# Sync all skills to ~/.codex/skills (user-level)
+go run scripts/codex-sync.go
+
+# Sync to .codex/skills in current project (project-level)
+go run scripts/codex-sync.go --project
+
+# Dry run to see what would be synced
+go run scripts/codex-sync.go --dry-run --verbose
+```
+
+## Installation
+
+### Build the binary
+
+From the repository root:
+
+```bash
+go build -o codex-sync scripts/codex-sync.go
+```
+
+### Run directly with go run
+
+From the repository root:
+
+```bash
+go run scripts/codex-sync.go [flags]
+```
+
+## Usage
+
+```bash
+codex-sync [flags]
+```
+
+### Flags
+
+| Flag                   | Description                                       | Default                             |
+| ---------------------- | ------------------------------------------------- | ----------------------------------- |
+| `--output <dir>`       | Custom output directory for Codex skills          | `~/.codex/skills`                   |
+| `--plugins <dir>`      | Directory containing Claude plugins               | `./plugins`                         |
+| `--marketplace <file>` | Path to marketplace.json                          | `./.claude-plugin/marketplace.json` |
+| `--project`            | Install to `.codex/skills` in current directory   | `false`                             |
+| `--prefix`             | Prefix skill names with plugin name               | `false`                             |
+| `--verbose`            | Enable verbose logging                            | `false`                             |
+| `--dry-run`            | Show what would be synced without modifying files | `false`                             |
+
+## Examples
+
+### User-level installation (default)
+
+Installs skills to `~/.codex/skills` for all your Codex sessions. Run from repository root:
+
+```bash
+go run scripts/codex-sync.go
+```
+
+### Project-level installation
+
+Installs skills to `.codex/skills` in the current repository. Run from repository root:
+
+```bash
+go run scripts/codex-sync.go --project
+```
+
+### Custom output directory
+
+Run from repository root:
+
+```bash
+go run scripts/codex-sync.go --output /path/to/custom/skills
+```
+
+### Verbose dry run
+
+See exactly what would be synced without making changes. Run from repository root:
+
+```bash
+go run scripts/codex-sync.go --dry-run --verbose
+```
+
+### Sync specific marketplace file
+
+Run from repository root:
+
+```bash
+go run scripts/codex-sync.go --marketplace /path/to/marketplace.json
+```
+
+## How It Works
+
+1. **Reads marketplace.json** - Discovers all plugins and their skills
+2. **Finds skill directories** - Locates each skill's SKILL.md and supporting files
+3. **Creates flat structure** - Skills use their original names (e.g., `commit-messages`, `react`) or prefixed names with `--prefix` flag
+4. **Copies files** - Recursively copies all skill files to the target directory
+5. **Maintains structure** - Preserves directory structure within each skill folder
+
+**Note:** Changes to source skills require re-running the sync to update the copied files in Codex.
+
+## Skill Naming Convention
+
+By default, skills are synced with their original names (flattened structure without plugin prefix):
+
+| Claude Plugin Skill    | Codex Skill Name (default) | With `--prefix` flag   |
+| ---------------------- | -------------------------- | ---------------------- |
+| `core:commit-messages` | `commit-messages`          | `core-commit-messages` |
+| `web:react`            | `react`                    | `web-react`            |
+| `app:swift-testing`    | `swift-testing`            | `app-swift-testing`    |
+
+**Note:** All skill names are unique across plugins, so no conflicts occur with the flattened structure.
+
+## Using Synced Skills in Codex
+
+After syncing, you can use skills in Codex CLI:
+
+```bash
+# Invoke a skill explicitly (using default flattened names)
+$commit-messages
+$react
+$swift-testing
+
+# Or with --prefix flag enabled
+$core-commit-messages
+$web-react
+$app-swift-testing
+
+# Let Codex auto-select based on context
+# Just describe what you need and Codex will use the appropriate skill
+```
+
+## Supported Skill Features
+
+The sync tool preserves all skill features:
+
+- ✅ SKILL.md with YAML frontmatter
+- ✅ Reference documentation files
+- ✅ Scripts and executables
+- ✅ Resource files and assets
+- ✅ Nested directory structures
+
+## Skills Synced
+
+Based on the current marketplace configuration, the following skills will be synced (shown with default flattened names):
+
+### Core Plugin
+
+- `commit-messages` - Git/conventional commit message guidance
+- `expectations` - Software engineering expectations and standards
+- `learn` - Learning and knowledge building
+- `pr` - Pull request creation and review
+- `writing` - Technical writing guidance
+- `prompt-master` - Prompt refinement and optimization
+
+### Web Plugin
+
+- `css` - CSS best practices and modern patterns
+- `tdd` - Test-driven development for web apps
+- `react` - React architecture and patterns
+- `react-testing` - React testing strategies
+- `frontend-testing` - Frontend testing approaches
+- `web-design` - Web design principles
+- `eyes` - Visual design and UI review
+- `chatgpt-app-sdk` - ChatGPT app SDK integration
+
+### App Plugin
+
+- `swift-testing` - Swift testing with Swift Testing framework
+- `app-intent-driven-development` - App Intent-first iOS development
+- `swiftui-architecture` - SwiftUI architecture patterns
+- `debug` - iOS debugging techniques
+
+### Product Management Plugin
+
+- `status-updates` - Status update creation and formatting
+
+### Life Plugin
+
+- `gps-method` - Personal goal achievement methodology
+
+**Note:** Use the `--prefix` flag to add plugin prefixes (e.g., `core-commit-messages` instead of `commit-messages`)
+
+## Troubleshooting
+
+### "SKILL.md not found" error
+
+Ensure the skill directory exists and contains a SKILL.md file:
+
+```bash
+ls -la plugins/core/skills/commit-messages/
+```
+
+### "Permission denied" when creating directories
+
+Ensure you have write permissions to the target directory:
+
+```bash
+# For user-level install
+chmod 755 ~/.codex
+
+# For project-level install
+chmod 755 .codex
+```
+
+### Skills not appearing in Codex
+
+1. Verify the sync completed successfully
+2. Check the output directory contains the skills:
+   ```bash
+   ls -la ~/.codex/skills/
+   ```
+3. Restart your Codex CLI session
+
+## Development
+
+### Project Structure
+
+```
+scripts/
+├── codex-sync.go       # Main sync script
+├── go.mod              # Go module definition
+└── README.md           # This file
+```
+
+### Code Structure
+
+The script consists of several key functions:
+
+- `main()` - CLI argument parsing and orchestration
+- `readMarketplace()` - Parses marketplace.json
+- `syncPlugin()` - Syncs all skills for a plugin
+- `syncSkill()` - Syncs individual skill directory
+- `copyFile()` - Copies files with permissions
+
+### Testing
+
+Run a dry run to test without modifying files. From repository root:
+
+```bash
+go run scripts/codex-sync.go --dry-run --verbose
+```
+
+## References
+
+- [OpenAI Codex Skills Documentation](https://developers.openai.com/codex/skills/)
+- [Agent Skills Open Standard](https://agentskills.io)
+- [OpenAI Skills Catalog](https://github.com/openai/skills)
+
+## License
+
+This script is part of the mintuz-claude-plugins repository and follows the same license.
