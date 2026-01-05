@@ -15,13 +15,14 @@ Guidelines for building SwiftUI apps using pure SwiftUI patterns without ViewMod
 - **@Observable over ObservableObject** - Modern, efficient shared state
 - **async/await over Combine** - Simpler async patterns
 - **Thin views, testable services** - Business logic in @Observable
+- **Small, focused views** - Extract repeated elements into subviews
 
 ## Property Wrapper Map
 
-- `@State` - Local, ephemeral UI state; dies with the view  
-- `@Binding` - Child edits parent-owned state; prefer callbacks if child only notifies  
-- `@Observable` - Shared, testable business logic/services across views  
-- `@Environment` - Inject shared @Observable services; avoid prop drilling  
+- `@State` - Local, ephemeral UI state; dies with the view
+- `@Binding` - Child edits parent-owned state; prefer callbacks if child only notifies
+- `@Observable` - Shared, testable business logic/services across views
+- `@Environment` - Inject shared @Observable services; avoid prop drilling
 
 Full guidance and examples: see `references/state-management.md`.
 
@@ -53,54 +54,127 @@ When building a new feature, ask:
    - Yes → Stop! Use @Observable service + thin view instead
    - No → Good!
 
-## Starter Pattern
+## Navigation with AppRouter
+
+Use AppRouter for type-safe, centralized navigation. Two patterns based on app structure:
+
+### Simple Navigation (No Tabs)
 
 ```swift
-// Service for business logic
-@Observable
-class ItemService {
-    func fetchItems() async throws -> [Item] {
-        try await API.fetchItems()
+import AppRouter
+
+enum Destination: DestinationType {
+    case detail(id: String)
+    case settings
+}
+
+enum Sheet: SheetType {
+    case compose
+    var id: Int { hashValue }
+}
+
+struct ContentView: View {
+    @State private var router = SimpleRouter<Destination, Sheet>()
+
+    var body: some View {
+        NavigationStack(path: $router.path) {
+            HomeView()
+                .navigationDestination(for: Destination.self) { destination in
+                    destinationView(for: destination)
+                }
+        }
+        .sheet(item: $router.presentedSheet) { sheet in
+            sheetView(for: sheet)
+        }
+        .environment(router)
     }
 }
 
-// View owns UI state
-struct ItemListView: View {
-    @Environment(ItemService.self) private var service
-    @State private var items: [Item] = []
-    @State private var isLoading = false
+// Navigate from child views
+struct HomeView: View {
+    @Environment(SimpleRouter<Destination, Sheet>.self) private var router
 
     var body: some View {
-        List(items) { item in
-            Text(item.name)
-        }
-        .overlay {
-            if isLoading {
-                ProgressView()
-            }
-        }
-        .task {
-            isLoading = true
-            defer { isLoading = false }
-            items = (try? await service.fetchItems()) ?? []
+        Button("Go to Detail") {
+            router.navigateTo(.detail(id: "123"))
         }
     }
 }
 ```
 
-## Key Rules
+### Tab-Based Navigation
 
-1. **Never create ViewModels** - Use @State in views and @Observable for services
-2. **Never nest @Observable objects** - Inject separately via @Environment
-3. **Keep state local until proven otherwise** - Don't prematurely lift to shared state
-4. **Use async/await, not Combine** - Unless you have a specific reactive need
-5. **Business logic in services, coordination in views** - Keeps both testable
+```swift
+enum AppTab: String, TabType, CaseIterable {
+    case home, profile, settings
+    var id: String { rawValue }
+    var icon: String {
+        switch self {
+        case .home: return "house"
+        case .profile: return "person"
+        case .settings: return "gear"
+        }
+    }
+}
+
+struct ContentView: View {
+    @State private var router = Router<AppTab, Destination, Sheet>(initialTab: .home)
+
+    var body: some View {
+        TabView(selection: $router.selectedTab) {
+            ForEach(AppTab.allCases) { tab in
+                NavigationStack(path: $router[tab]) {
+                    tabContent(for: tab)
+                        .navigationDestination(for: Destination.self) { destination in
+                            destinationView(for: destination)
+                        }
+                }
+                .tabItem { Label(tab.rawValue.capitalized, systemImage: tab.icon) }
+                .tag(tab)
+            }
+        }
+        .sheet(item: $router.presentedSheet) { sheet in
+            sheetView(for: sheet)
+        }
+        .environment(router)
+    }
+}
+```
+
+**Key points:**
+
+- Each tab maintains independent navigation history
+- Sheets are shared across all tabs
+- Router injected via `.environment()` to avoid prop drilling
+- Deep linking: Implement `from(path:fullPath:parameters:)` in `DestinationType`
+
+See `references/navigation-patterns.md` for deep linking, URL handling, and advanced routing.
+
+## UI Component Quick Reference
+
+| Component  | When to Use                          | See Reference              |
+| ---------- | ------------------------------------ | -------------------------- |
+| List       | Long scrolling feeds, settings       | `references/lists.md`      |
+| ScrollView | Custom layouts, horizontal scrolling | `references/scrollview.md` |
+| Form       | Settings screens, input-heavy UIs    | `references/forms.md`      |
+| LazyVGrid  | Photo grids, icon pickers            | `references/grids.md`      |
+| Sheet      | Modal presentations                  | `references/sheets.md`     |
+| TabView    | Multiple top-level sections          | `references/tabs.md`       |
+
+Common patterns:
+
+- **Scroll to position**: Use `ScrollViewReader` with `.id()` on elements
+- **Pull to refresh**: Add `.refreshable` to List or ScrollView
+- **Search**: Apply `.searchable(text:)` with debounced `.task(id:)`
+- **Focus management**: Use `@FocusState` with enum-based field tracking
 
 ## Progressive Guides
 
 - **State management** - Property wrapper decision matrix, data-flow examples, and when to lift state; see `references/state-management.md`.
 - **Observable patterns** - Setting up @Observable services, injecting multiple managers, and avoiding nested observables; see `references/observable-patterns.md`.
 - **Async patterns** - .task usage, loading-state enums, cancellation, refreshable, and error handling; see `references/async-patterns.md`.
+- **Navigation patterns** - AppRouter setup, deep linking, URL handling, and routing best practices; see `references/navigation-patterns.md`.
+- **UI components** - Detailed patterns for List, ScrollView, Form, Grid, Sheet, and TabView; see component-specific references.
 - **Anti-patterns** - What to avoid (ViewModels, Combine-first async, nested observables, overusing @Binding); see `references/anti-patterns.md`.
 
 ## Testing & Previews
