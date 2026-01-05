@@ -1,6 +1,6 @@
 # Async Data Loading
 
-Use async/await with the .task modifier for lifecycle-aware async operations. Avoid Combine unless absolutely necessary.
+Use async/await with the .task modifier for lifecycle-aware async operations.
 
 ## The .task Modifier Pattern
 

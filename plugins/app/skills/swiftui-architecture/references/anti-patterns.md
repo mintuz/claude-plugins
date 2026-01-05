@@ -37,28 +37,6 @@ struct ContentView: View {
 }
 ```
 
-## ❌ Don't Unnecessarily Move State Out
-
-Keep state in views when it's view-specific. Only extract when multiple views need it.
-
-**WRONG:**
-
-```swift
-@Observable
-class SearchManager {
-    var searchText = ""  // Only one view uses this
-}
-```
-
-**CORRECT:**
-
-```swift
-struct SearchView: View {
-    @State private var searchText = ""
-    // ...
-}
-```
-
 ## ❌ Don't Use Combine for Simple Async
 
 **WRONG:**

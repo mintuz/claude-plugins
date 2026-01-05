@@ -210,21 +210,6 @@ ScrollView {
 .scrollDismissesKeyboard(.immediately)    // Dismiss when scroll starts
 ```
 
-## Pull to Refresh
-
-```swift
-ScrollView {
-    LazyVStack {
-        ForEach(items) { item in
-            ItemView(item: item)
-        }
-    }
-}
-.refreshable {
-    await loadItems()
-}
-```
-
 ## Performance
 
 ### Use Lazy Containers

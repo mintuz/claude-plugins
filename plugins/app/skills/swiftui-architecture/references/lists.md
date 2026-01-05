@@ -27,9 +27,6 @@ struct FeedView: View {
             ItemRow(item: item)
         }
         .listStyle(.plain)
-        .refreshable {
-            await loadItems()
-        }
     }
 }
 ```
@@ -132,65 +129,6 @@ List(items) { item in
             }
             .tint(.yellow)
         }
-}
-```
-
-## Scroll Management
-
-### Scroll to Position
-
-```swift
-struct ScrollableList: View {
-    @State private var items: [Item] = []
-    let scrollToID: String?
-
-    var body: some View {
-        ScrollViewReader { proxy in
-            List(items) { item in
-                ItemRow(item: item)
-                    .id(item.id)
-            }
-            .onChange(of: scrollToID) { _, newValue in
-                if let id = newValue {
-                    withAnimation {
-                        proxy.scrollTo(id, anchor: .center)
-                    }
-                }
-            }
-        }
-    }
-}
-```
-
-### Scroll to Top
-
-```swift
-struct FeedView: View {
-    @State private var items: [Item] = []
-
-    var body: some View {
-        ScrollViewReader { proxy in
-            List {
-                // Invisible anchor at top
-                Color.clear
-                    .frame(height: 0)
-                    .id("top")
-
-                ForEach(items) { item in
-                    ItemRow(item: item)
-                }
-            }
-            .toolbar {
-                Button {
-                    withAnimation {
-                        proxy.scrollTo("top", anchor: .top)
-                    }
-                } label: {
-                    Image(systemName: "arrow.up")
-                }
-            }
-        }
-    }
 }
 ```
 

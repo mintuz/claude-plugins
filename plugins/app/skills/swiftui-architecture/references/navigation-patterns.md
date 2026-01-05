@@ -2,18 +2,25 @@
 
 Comprehensive guide to navigation using AppRouter for SwiftUI apps on iOS 17+.
 
+Terminology: use “AppRouter” for the library, and “router” for an instance.
+
 ## Core Concepts
 
 **State Management**: AppRouter uses `@Observable` and `@MainActor` for thread-safe, reactive navigation.
 
 **Two Router Types:**
+
 - **SimpleRouter**: Single navigation stack (no tabs)
 - **Router**: Tab-based apps with independent stacks per tab
 
 **Navigation Elements:**
+
 - **Destinations**: Push navigation within a NavigationStack
 - **Sheets**: Modal presentations shared across the app
 - **Tabs**: Top-level navigation sections (Router only)
+
+- For sheet presentation details, see `references/sheets.md`.
+- For tab-specific patterns, see `references/tabs.md`.
 
 ## Router Setup Patterns
 
@@ -141,6 +148,7 @@ struct ContentView: View {
 ```
 
 **Key Points:**
+
 - Each tab has independent navigation history
 - Switching tabs preserves navigation state
 - Sheets are shared globally across all tabs
@@ -312,27 +320,6 @@ static func from(
 
 ## Advanced Patterns
 
-### Sheets with Navigation
-
-When a sheet needs internal navigation, nest a NavigationStack:
-
-```swift
-.sheet(item: $router.presentedSheet) { sheet in
-    switch sheet {
-    case .compose:
-        NavigationStack {
-            ComposeView()
-        }
-    case .settings:
-        NavigationStack {
-            SettingsView()
-        }
-    default:
-        sheetView(for: sheet)
-    }
-}
-```
-
 ### Type Aliases
 
 Reduce verbose generic syntax with type aliases:
@@ -342,23 +329,6 @@ typealias AppRouter = Router<AppTab, Destination, Sheet>
 
 // Then use:
 @Environment(AppRouter.self) private var router
-```
-
-### Reset Navigation on Context Change
-
-Clear navigation when context changes (logout, account switch):
-
-```swift
-func handleLogout() {
-    // Clear all navigation state
-    router.popToRoot()
-    router.presentedSheet = nil
-
-    // For tab router, reset all tabs
-    for tab in AppTab.allCases {
-        router[tab].removeAll()
-    }
-}
 ```
 
 ### Programmatic Tab + Navigate

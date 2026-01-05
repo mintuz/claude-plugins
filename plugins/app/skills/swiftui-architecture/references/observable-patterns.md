@@ -24,71 +24,6 @@ class SettingsManager {
 }
 ```
 
-## Critical: Don't Nest @Observable Objects
-
-Nesting @Observable objects breaks SwiftUI's observation system.
-
-**WRONG - Breaks observation:**
-
-```swift
-@Observable
-class UserManager {
-    var settings: SettingsManager  // WRONG - nested @Observable
-}
-```
-
-**CORRECT - Keep them separate:**
-
-```swift
-@Observable
-class UserManager {
-    var userId: String
-    var username: String
-}
-
-@Observable
-class SettingsManager {
-    var theme: Theme
-}
-
-// Inject both separately
-ContentView()
-    .environment(userManager)
-    .environment(settingsManager)
-```
-
-## Injecting Multiple Services
-
-When you have multiple @Observable managers, inject them separately through @Environment:
-
-```swift
-@main
-struct MyApp: App {
-    @State private var userManager = UserManager()
-    @State private var settingsManager = SettingsManager()
-    @State private var networkManager = NetworkManager()
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .environment(userManager)
-                .environment(settingsManager)
-                .environment(networkManager)
-        }
-    }
-}
-
-struct ContentView: View {
-    @Environment(UserManager.self) private var userManager
-    @Environment(SettingsManager.self) private var settingsManager
-    @Environment(NetworkManager.self) private var networkManager
-
-    var body: some View {
-        // Access all managers independently
-    }
-}
-```
-
 ## Observable Services Pattern
 
 Keep business logic in @Observable services for testability:
@@ -136,3 +71,5 @@ struct ItemListView: View {
     }
 }
 ```
+
+For injection patterns and nested observables, see `references/state-management.md` and `references/anti-patterns.md`.
