@@ -9,12 +9,13 @@ Build ChatGPT apps using the OpenAI Apps SDK, Model Context Protocol (MCP), and 
 
 ## Quick Reference
 
-| Topic                                           | Guide                                                   |
-| ----------------------------------------------- | ------------------------------------------------------- |
-| Display modes, visual design, accessibility     | [ui-guidelines.md](./references/ui-guidelines.md)       |
-| MCP architecture, tools, and server patterns    | [mcp-server.md](./references/mcp-server.md)             |
-| React patterns and window.openai API            | [ui-components.md](./references/ui-components.md)       |
-| Three-tier state architecture and best practice | [state-management.md](./references/state-management.md) |
+| Topic                                           | Guide                                                       |
+| ----------------------------------------------- | ----------------------------------------------------------- |
+| Display modes, visual design, accessibility     | [ui-guidelines.md](./references/ui-guidelines.md)           |
+| MCP architecture, tools, and server patterns    | [mcp-server.md](./references/mcp-server.md)                 |
+| React patterns and window.openai API            | [ui-components.md](./references/ui-components.md)           |
+| React hooks (useOpenAiGlobal, useWidgetState)   | [react-integration.md](./references/react-integration.md)   |
+| Three-tier state architecture and best practice | [state-management.md](./references/state-management.md)     |
 
 ## Critical Setup Requirements
 

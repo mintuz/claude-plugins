@@ -52,15 +52,14 @@
 
 ```typescript
 // React component
-const [uiState, setUiState] = useWidgetState();
-
-// uiState might contain:
-{
+const [uiState, setUiState] = useWidgetState({
   selectedTaskId: 2,
   sortBy: "status",
   expandedSections: ["completed"]
-}
+});
 ```
+
+**For detailed hook implementation and patterns:** See [react-integration.md](./react-integration.md)
 
 ## Best Practices
 
@@ -127,11 +126,15 @@ async function handleToggleTask(taskId) {
 
 ```typescript
 function TaskList() {
-  // Server data
-  const { tasks } = window.openai.toolOutput || { tasks: [] };
+  // Server data (from tool response)
+  const toolOutput = useOpenAiGlobal('toolOutput');
+  const tasks = toolOutput?.tasks ?? [];
 
-  // UI state
-  const [uiState, setUiState] = useWidgetState();
+  // UI state (persisted)
+  const [uiState, setUiState] = useWidgetState({
+    selectedId: null,
+    sortBy: 'status'
+  });
 
   // Derived state
   const sortedTasks = useMemo(() => {
@@ -154,6 +157,8 @@ function TaskList() {
   );
 }
 ```
+
+**For more syncing patterns:** See [react-integration.md](./react-integration.md)
 
 ### Form State vs Widget State
 

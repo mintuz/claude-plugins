@@ -4,24 +4,30 @@
 
 ### useOpenAiGlobal Hook
 
-Use `useOpenAiGlobal` to subscribe to global values:
+Subscribe to individual `window.openai` properties:
 
 ```typescript
-// Wraps window.openai access with useSyncExternalStore
-const { theme, displayMode, locale } = useOpenAiGlobal();
+const theme = useOpenAiGlobal('theme');
+const displayMode = useOpenAiGlobal('displayMode');
+const locale = useOpenAiGlobal('locale');
 ```
 
-This hook listens for host events and keeps components reactive to theme, display mode, and locale changes.
+Components automatically re-render when subscribed values change.
 
-### Widget State Hook
+### useWidgetState Hook
 
-Use the `useWidgetState` hook in React for UI state:
+Manage persisted UI state:
 
 ```typescript
-const [uiState, setUiState] = useWidgetState();
+const [uiState, setUiState] = useWidgetState({
+  selectedId: null,
+  sortBy: 'status'
+});
 ```
 
-This persists selections, expansions, and view preferences across widget renders.
+State persists across widget renders and conversation turns.
+
+**For detailed hook implementation, usage patterns, and best practices:** See [react-integration.md](./react-integration.md)
 
 ## Bundling Strategy
 
