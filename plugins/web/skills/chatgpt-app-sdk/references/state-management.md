@@ -1,9 +1,11 @@
 # State Management
 
-## Prerequisites
+## Contents
 
-- Load the `web:react` skill for React Best Practices.
-- Load the `typescript` skill for TypeScript Best Practices.
+- Three-Tier Architecture (Business Data, UI State)
+- Best Practices (Don't Auto-Sync UI State)
+- State Flow Diagram
+- Common Patterns (Optimistic Updates, Syncing State, Form State)
 
 ## Three-Tier Architecture
 

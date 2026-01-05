@@ -1,23 +1,5 @@
 # Building UI Components
 
-## Prerequisites
-
-- Load the `web:react` skill for React Best Practices.
-- Load the `web:css` skill for CSS Best Practices.
-- Load the `web:tailwind` skill for Tailwind CSS Best Practices.
-- Load the `web:react-testing` skill for React Testing Library Best Practices.
-- Load the `typescript` skill for TypeScript Best Practices.
-
-## Project Structure
-
-```
-app/
-  server/          # MCP server
-  web/             # Component source
-    src/component.tsx
-    dist/component.js
-```
-
 ## React Patterns
 
 ### useOpenAiGlobal Hook
@@ -43,17 +25,83 @@ This persists selections, expansions, and view preferences across widget renders
 
 ## Bundling Strategy
 
-Build with esbuild into a single ESM module:
+Separate widget code from MCP server. Build with Vite and deploy to CDN.
 
-```json
-{
-  "scripts": {
-    "build": "esbuild src/component.tsx --bundle --format=esm --outfile=dist/component.js"
-  }
-}
+**Project structure:**
+
+```
+app/
+  server/          # MCP server
+  widget/          # Widget source (Vite project)
+    src/
+      main.tsx
+    vite.config.ts
+    dist/          # Build output for CDN
+      widget.js
+      widget.css
 ```
 
-Embed compiled JavaScript in server's tool response metadata.
+**Vite configuration:**
+
+```typescript
+// vite.config.ts
+export default {
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: 'widget.js',
+        assetFileNames: 'widget.css'
+      }
+    }
+  },
+  server: {
+    cors: {
+      origin: 'https://chatgpt.com',
+      credentials: true
+    }
+  }
+};
+```
+
+**Reference CDN files from MCP server:**
+
+```typescript
+const CDN_BASE = process.env.WIDGET_CDN_URL || 'http://localhost:5173';
+
+server.registerResource(
+  "kanban-widget",
+  "ui://widget/kanban.html",
+  {},
+  async () => ({
+    contents: [{
+      uri: "ui://widget/kanban.html",
+      mimeType: "text/html+skybridge",
+      text: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <link rel="stylesheet" href="${CDN_BASE}/widget.css" />
+          </head>
+          <body>
+            <div id="root"></div>
+            <script type="module" src="${CDN_BASE}/widget.js"></script>
+          </body>
+        </html>
+      `
+    }]
+  })
+);
+```
+
+**Local development:**
+- Run `vite` in widget directory (typically port 5173)
+- Configure CORS headers to allow `https://chatgpt.com`
+- Set `WIDGET_CDN_URL=http://localhost:5173` for MCP server
+
+**Production deployment:**
+- Build: `vite build` → generates `dist/widget.js` and `dist/widget.css`
+- Deploy `dist/` to CDN with stable file names
+- Set `WIDGET_CDN_URL` to production CDN base URL
 
 ## Localization
 

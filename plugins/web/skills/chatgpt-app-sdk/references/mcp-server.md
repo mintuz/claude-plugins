@@ -1,39 +1,54 @@
 # Building MCP Servers
 
-## Prerequisites
-
-- Load the `typescript` skill for TypeScript Best Practices.
-
 ## Architecture Components
 
 ChatGPT apps consist of three layers:
 
 1. **MCP Server** - Defines tools and enforces auth
-2. **Widget/UI Bundle** - Renders in ChatGPT's iframe
+2. **Widget** - Renders in ChatGPT's iframe
 3. **Model** - Decides when to invoke tools
 
 ## Implementation Steps
 
-### 1. Register Component Templates
+### 1. Register Widget Templates
 
-Templates are MCP resources with `mimeType: "text/html+skybridge"`:
+Widget templates are MCP resources with `mimeType: "text/html+skybridge"`. Reference CDN-hosted assets:
 
 ```typescript
+const CDN_BASE = process.env.WIDGET_CDN_URL || 'http://localhost:5173';
+
 server.registerResource(
   "kanban-widget",
-  "ui://widget/kanban-board.html",
+  "ui://widget/kanban.html",
   {},
   async () => ({
     contents: [
       {
-        uri: "ui://widget/kanban-board.html",
+        uri: "ui://widget/kanban.html",
         mimeType: "text/html+skybridge",
-        text: `<div id="kanban-root"></div>...`,
+        text: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <link rel="stylesheet" href="${CDN_BASE}/widget.css" />
+            </head>
+            <body>
+              <div id="root"></div>
+              <script type="module" src="${CDN_BASE}/widget.js"></script>
+            </body>
+          </html>
+        `,
       },
     ],
   })
 );
 ```
+
+**Environment configuration:**
+- Local: `WIDGET_CDN_URL=http://localhost:5173` (Vite dev server)
+- Production: `WIDGET_CDN_URL=https://cdn.example.com` (CDN base URL)
+
+See [ui-components.md](./ui-components.md) for widget build configuration.
 
 ### 2. Describe Tools with Clear Contracts
 
@@ -46,11 +61,22 @@ server.registerTool(
     title: "Show Kanban Board",
     inputSchema: { workspace: z.string() },
     _meta: {
-      "openai/outputTemplate": "ui://widget/kanban-board.html",
+      "openai/outputTemplate": "ui://widget/kanban.html",
     },
   },
   async ({ workspace }) => {
-    /* handler */
+    const tasks = await database.getTasks(workspace);
+
+    return {
+      structuredContent: {
+        workspace,
+        taskCount: tasks.length,
+        columns: ["Todo", "In Progress", "Done"]
+      },
+      _meta: {
+        initialData: { tasks, workspace }
+      }
+    };
   }
 );
 ```
@@ -72,54 +98,85 @@ Responses include three components:
 }
 ```
 
-## Widget Runtime Access
-
-The sandboxed iframe exposes `window.openai` with:
-
-### Data
-
-- `toolInput` - Tool invocation parameters
-- `toolOutput` - Tool response data
-- `toolResponseMetadata` - Widget-specific metadata
-- `widgetState` - Persistent UI state
-
-### Actions
-
-- `callTool()` - Invoke MCP tools from widget
-- `sendFollowUpMessage()` - Insert messages into conversation
-- `uploadFile()` / `getFileDownloadUrl()` - File operations
-
-### Layout
-
-- `requestModal()` - Request modal display
-- `requestDisplayMode()` - Switch display modes
-- `notifyIntrinsicHeight()` - Update widget height
-
-### Context
-
-- `theme` - Current theme (light/dark)
-- `displayMode` - Current display mode
-- `locale` - User's locale preference
+For widget runtime and `window.openai` usage, see `./ui-components.md`.
 
 ## Best Practices
 
 ### Idempotent Handlers
 
-The model may retry tool calls - ensure handlers are safe to re-execute
+The model may retry tool calls - ensure handlers are safe to re-execute:
+
+```typescript
+let executionCache = new Map();
+
+async function handleCreateTask({ title }) {
+  const cacheKey = `create_${title}_${Date.now()}`;
+
+  if (executionCache.has(cacheKey)) {
+    return executionCache.get(cacheKey);
+  }
+
+  const result = await database.createTask(title);
+  executionCache.set(cacheKey, result);
+  return result;
+}
+```
 
 ### Trim Structured Content
 
-Oversized payloads degrade model performance - keep concise
+Keep model-facing data concise. Move large datasets to `_meta`:
+
+```typescript
+return {
+  // Model sees this (concise)
+  structuredContent: {
+    summary: "Found 150 tasks",
+    topPriorities: tasks.slice(0, 3)
+  },
+  // Widget sees this (comprehensive)
+  _meta: {
+    initialData: { allTasks: tasks }
+  }
+};
+```
+
+### Error Handling
+
+Return user-friendly errors in `content`, technical details in `_meta`:
+
+```typescript
+try {
+  const data = await fetchData();
+  return { structuredContent: data };
+} catch (error) {
+  return {
+    content: [{
+      type: "text",
+      text: "Unable to load data. Please try again."
+    }],
+    _meta: {
+      error: error.message,
+      stack: error.stack
+    }
+  };
+}
+```
 
 ### Security
 
 - Never embed secrets in visible payloads
 - Enforce auth server-side
 - Configure CSP via `openai/widgetCSP`
+- Validate all tool inputs with schemas
 
 ### Template URIs
 
-Cache-bust by changing URIs when making breaking changes
+Cache-bust by changing URIs when making breaking changes:
+
+```typescript
+// Before: ui://widget/kanban.html
+// After:  ui://widget/kanban-v2.html
+```
 
 ### Deployment
 

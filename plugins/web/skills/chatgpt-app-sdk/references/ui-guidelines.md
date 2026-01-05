@@ -2,36 +2,58 @@
 
 ## Display Modes
 
-### Inline (Default)
+Choose the appropriate display mode based on content complexity and user workflow.
 
-- Appears directly in conversation flow before model responses
-- Includes icon/tool call label and lightweight embedded content
-- Model generates follow-up suggesting edits or next steps
+| Mode              | Use When                                        | Max Actions | Scrolling |
+| ----------------- | ----------------------------------------------- | ----------- | --------- |
+| Inline Card       | Quick confirmation or small structured data     | 2           | None      |
+| Inline Carousel   | 3-8 similar items for comparison                | 1 per item  | None      |
+| Fullscreen        | Multi-step workflows or deep exploration        | Unlimited   | Yes       |
+| Picture-in-Picture | Parallel activities (games, live monitoring)    | Unlimited   | Yes       |
 
-### Inline Cards
+### Inline Card
 
-- Single-purpose widgets for quick confirmations or small structured data
-- Support up to two primary actions maximum
-- Auto-fit content and prevent internal scrolling
-- No nested navigation, tabs, or multiple drill-ins
+**Best for:** Confirmations, status updates, single records
+
+**Constraints:**
+- Auto-fit content (no internal scrolling)
+- Max two primary actions
+- No nested navigation or tabs
+
+**Example use cases:** Order confirmation, flight status, single task details
 
 ### Inline Carousel
 
-- Present 3–8 similar items side-by-side
-- Include images, titles, and limited metadata (max three lines)
-- Each item may have one optional CTA
+**Best for:** Browsing similar items side-by-side
+
+**Constraints:**
+- 3-8 items (fewer than 3: use card, more than 8: use fullscreen)
+- Images, titles, max three lines of metadata per item
+- One optional CTA per item
+
+**Example use cases:** Product comparison, image gallery, search results
 
 ### Fullscreen
 
-- Immersive experiences for multi-step workflows or deep exploration
+**Best for:** Complex workflows requiring multiple steps or deep exploration
+
+**Behavior:**
 - ChatGPT composer remains overlaid for continued conversation
-- Use when inline cards are insufficient
+- Full scrolling and navigation support
+- Use when inline cards can't contain the content
+
+**Example use cases:** Multi-step forms, data visualization, document editors
 
 ### Picture-in-Picture (PiP)
 
-- Persistent floating window for parallel activities (games, live sessions)
-- Stays fixed to viewport top on scroll
-- Updates dynamically based on user prompts
+**Best for:** Persistent parallel activities
+
+**Behavior:**
+- Stays fixed to viewport top during scroll
+- Updates dynamically based on prompts
+- Runs alongside conversation
+
+**Example use cases:** Games, live timers, monitoring dashboards
 
 ## Visual Design
 

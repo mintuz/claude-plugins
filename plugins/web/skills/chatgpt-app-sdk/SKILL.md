@@ -5,16 +5,16 @@ description: WHEN building ChatGPT apps using the OpenAI Apps SDK and MCP; creat
 
 # ChatGPT Apps SDK Best Practices
 
-ChatGPT app development using the OpenAI Apps SDK, Model Context Protocol (MCP), and component-based UI patterns.
+Build ChatGPT apps using the OpenAI Apps SDK, Model Context Protocol (MCP), and component-based UI patterns.
 
 ## Quick Reference
 
-| Topic                                           | Guide                                                 |
-| ----------------------------------------------- | ----------------------------------------------------- |
-| Display modes, visual design, accessibility     | [ui-guidelines.md](references/ui-guidelines.md)       |
-| MCP architecture, tools, and server patterns    | [mcp-server.md](references/mcp-server.md)             |
-| React patterns and window.openai API            | [ui-components.md](references/ui-components.md)       |
-| Three-tier state architecture and best practice | [state-management.md](references/state-management.md) |
+| Topic                                           | Guide                                                   |
+| ----------------------------------------------- | ------------------------------------------------------- |
+| Display modes, visual design, accessibility     | [ui-guidelines.md](./references/ui-guidelines.md)       |
+| MCP architecture, tools, and server patterns    | [mcp-server.md](./references/mcp-server.md)             |
+| React patterns and window.openai API            | [ui-components.md](./references/ui-components.md)       |
+| Three-tier state architecture and best practice | [state-management.md](./references/state-management.md) |
 
 ## Critical Setup Requirements
 
@@ -25,50 +25,9 @@ ChatGPT app development using the OpenAI Apps SDK, Model Context Protocol (MCP),
 | Plain text display  | Set MIME type to `text/html+skybridge` for widgets    |
 | Tool not suggested  | Use action-oriented descriptions in tool definitions  |
 | Missing widget data | Pass initial data via `_meta.initialData` field       |
-| CSP script blocking | Use inline scripts only (no external script tags)     |
+| CSP script blocking | Reference external scripts from allowed CDN origins   |
 
-## When to Use Each Guide
-
-### UI Guidelines
-
-Use [ui-guidelines.md](references/ui-guidelines.md) when you need:
-
-- Display mode selection (inline cards, carousel, fullscreen, PiP)
-- Visual design constraints (color, typography, spacing)
-- Accessibility requirements (WCAG AA, alt text, resizing)
-- Design system resources and components
-
-### MCP Server
-
-Use [mcp-server.md](references/mcp-server.md) when you need:
-
-- MCP architecture and concepts
-- Tool registration and contracts
-- Layered payload structure (structuredContent, content, \_meta)
-- window.openai API reference (data, actions, layout, context)
-- Security patterns and deployment guidance
-- Advanced features (private tools, file parameters, localization)
-
-### UI Components
-
-Use [ui-components.md](references/ui-components.md) when you need:
-
-- React patterns (useOpenAiGlobal, useWidgetState)
-- Project structure and bundling strategy
-- window.openai API integration
-- Localization implementation
-
-### State Management
-
-Use [state-management.md](references/state-management.md) when you need:
-
-- State tier decisions (business, UI, cross-session)
-- Preventing state divergence
-- Optimistic update patterns
-- Image ID management for model reasoning
-- State flow diagrams and common patterns
-
-## Quick Reference: Decision Trees
+## Decision Trees
 
 ### What display mode should I use?
 
