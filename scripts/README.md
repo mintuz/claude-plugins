@@ -1,12 +1,105 @@
-# Claude to Codex Skills Sync
+# Claude Plugin Skills Tools
 
-This directory contains tools for syncing Claude plugin skills to OpenAI Codex.
+This directory contains tools for working with Claude plugin skills across different platforms.
 
 ## Overview
 
-The `codex-sync.go` script converts and copies skills from the Claude plugin marketplace to the Codex skills format, making them available for use in OpenAI's Codex CLI.
+This directory contains two main tools:
 
-**IMPORTANT:** This script must be run from the repository root directory, not from within the `scripts/` directory.
+1. **`package-skills.go`** - Packages skills into a zip file for uploading to Claude web (claude.ai)
+2. **`codex-sync.go`** - Syncs skills to OpenAI Codex CLI format
+
+**IMPORTANT:** Both scripts must be run from the repository root directory, not from within the `scripts/` directory.
+
+---
+
+## Package Skills for Claude Web
+
+The `package-skills.go` script creates a zip file containing all skills from the marketplace in a flat folder structure, ready to upload to the Claude web interface at claude.ai.
+
+### Why Use This?
+
+Upload the packaged skills to Claude web to access all plugin skills directly in your browser sessions without needing Claude Code CLI.
+
+### Quick Start
+
+Run these commands from the repository root:
+
+```bash
+# Create a timestamped zip file (e.g., claude-plugins-skills-20260105-143022.zip)
+go run scripts/package-skills.go
+
+# Create a custom-named zip file
+go run scripts/package-skills.go --output my-skills.zip
+
+# Validate skills without creating zip (dry run)
+go run scripts/package-skills.go --dry-run --verbose
+```
+
+### Usage
+
+```bash
+go run scripts/package-skills.go [flags]
+```
+
+### Flags
+
+| Flag                   | Description                                      | Default                             |
+| ---------------------- | ------------------------------------------------ | ----------------------------------- |
+| `--output <file>`      | Output zip file path                             | Timestamped filename                |
+| `--marketplace <file>` | Path to marketplace.json                         | `./.claude-plugin/marketplace.json` |
+| `--prefix`             | Prefix skill names with plugin name              | `false`                             |
+| `--verbose`            | Enable verbose logging                           | `false`                             |
+| `--dry-run`            | Validate without creating zip file               | `false`                             |
+
+### Examples
+
+#### Create timestamped zip file (default)
+
+```bash
+go run scripts/package-skills.go
+# Creates: claude-plugins-skills-20260105-143022.zip
+```
+
+#### Create custom-named zip file
+
+```bash
+go run scripts/package-skills.go --output claude-skills.zip
+```
+
+#### Prefix skill names with plugin name
+
+```bash
+go run scripts/package-skills.go --prefix
+# Skills named: core-commit-messages, web-react, app-swift-testing, etc.
+```
+
+#### Verbose dry run
+
+```bash
+go run scripts/package-skills.go --dry-run --verbose
+```
+
+### How It Works
+
+1. **Reads marketplace.json** - Discovers all plugins and their skills
+2. **Validates skills** - Ensures each skill has required SKILL.md file
+3. **Creates flat structure** - All skills at zip root with optional plugin prefix
+4. **Packages files** - Recursively adds all skill files to zip
+5. **Reports statistics** - Shows skills packaged, files added, and final size
+
+### Using Packaged Skills
+
+1. Run the script to create a zip file
+2. Visit claude.ai
+3. Upload the zip file in the skills section
+4. Access all skills in your web conversations
+
+---
+
+## Sync Skills to Codex CLI
+
+The `codex-sync.go` script converts and copies skills from the Claude plugin marketplace to the Codex skills format, making them available for use in OpenAI's Codex CLI.
 
 ## Quick Start
 
@@ -195,7 +288,9 @@ Based on the current marketplace configuration, the following skills will be syn
 
 ## Troubleshooting
 
-### "SKILL.md not found" error
+### Common Issues (Both Scripts)
+
+#### "SKILL.md not found" error
 
 Ensure the skill directory exists and contains a SKILL.md file:
 
@@ -203,7 +298,39 @@ Ensure the skill directory exists and contains a SKILL.md file:
 ls -la plugins/core/skills/commit-messages/
 ```
 
-### "Permission denied" when creating directories
+#### Skills have no content or missing files
+
+Verify the marketplace.json correctly references skill paths:
+
+```bash
+cat .claude-plugin/marketplace.json | grep -A 5 "skills"
+```
+
+### Package Skills Issues
+
+#### "Permission denied" when creating zip file
+
+Ensure you have write permissions to the output directory:
+
+```bash
+# Check current directory permissions
+ls -la .
+
+# Or specify a directory where you have write access
+go run scripts/package-skills.go --output ~/Downloads/claude-skills.zip
+```
+
+#### Zip file is empty or incomplete
+
+Run with verbose flag to see what's being packaged:
+
+```bash
+go run scripts/package-skills.go --dry-run --verbose
+```
+
+### Codex Sync Issues
+
+#### "Permission denied" when creating directories
 
 Ensure you have write permissions to the target directory:
 
@@ -215,7 +342,7 @@ chmod 755 ~/.codex
 chmod 755 .codex
 ```
 
-### Skills not appearing in Codex
+#### Skills not appearing in Codex
 
 1. Verify the sync completed successfully
 2. Check the output directory contains the skills:
@@ -230,15 +357,25 @@ chmod 755 .codex
 
 ```
 scripts/
-├── codex-sync.go       # Main sync script
+├── package-skills.go   # Package skills to zip for Claude web
+├── codex-sync.go       # Sync skills to Codex CLI
 ├── go.mod              # Go module definition
 └── README.md           # This file
 ```
 
 ### Code Structure
 
-The script consists of several key functions:
+Both scripts share similar architecture:
 
+**package-skills.go:**
+- `main()` - CLI argument parsing and orchestration
+- `readMarketplace()` - Parses marketplace.json
+- `createSkillsZip()` - Creates and manages zip archive
+- `packagePlugin()` - Packages all skills for a plugin
+- `packageSkill()` - Adds individual skill to zip
+- `addFileToZip()` - Adds files to zip with compression
+
+**codex-sync.go:**
 - `main()` - CLI argument parsing and orchestration
 - `readMarketplace()` - Parses marketplace.json
 - `syncPlugin()` - Syncs all skills for a plugin
@@ -247,18 +384,26 @@ The script consists of several key functions:
 
 ### Testing
 
-Run a dry run to test without modifying files. From repository root:
+Run dry runs to test without modifying files. From repository root:
 
 ```bash
+# Test package-skills.go (zip packaging)
+go run scripts/package-skills.go --dry-run --verbose
+
+# Test codex-sync.go (Codex sync)
 go run scripts/codex-sync.go --dry-run --verbose
 ```
 
 ## References
 
-- [OpenAI Codex Skills Documentation](https://developers.openai.com/codex/skills/)
+### Claude Web
+- [Claude Web Interface](https://claude.ai)
 - [Agent Skills Open Standard](https://agentskills.io)
+
+### OpenAI Codex
+- [OpenAI Codex Skills Documentation](https://developers.openai.com/codex/skills/)
 - [OpenAI Skills Catalog](https://github.com/openai/skills)
 
 ## License
 
-This script is part of the mintuz-claude-plugins repository and follows the same license.
+These scripts are part of the mintuz-claude-plugins repository and follow the same license.
