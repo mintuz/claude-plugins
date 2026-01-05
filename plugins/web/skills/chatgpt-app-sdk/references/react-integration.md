@@ -14,9 +14,60 @@ Subscribe to individual `window.openai` properties with automatic re-renders on 
 useOpenAiGlobal<K extends keyof OpenAiGlobals>(key: K): OpenAiGlobals[K] | null
 ```
 
-**Implementation:**
+**Full Implementation:**
 
-Uses React's `useSyncExternalStore` to subscribe to `openai:set_globals` events. Only triggers re-renders when the specified key changes.
+```typescript
+import { useSyncExternalStore } from "react";
+import {
+  SET_GLOBALS_EVENT_TYPE,
+  type OpenAiGlobals,
+  type SetGlobalsEvent,
+} from "./types";
+
+export const useOpenAiGlobal = <K extends keyof OpenAiGlobals>(
+  key: K
+): OpenAiGlobals[K] | null => {
+  return useSyncExternalStore(
+    // Subscribe function
+    (onChange) => {
+      // Handle server-side rendering
+      if (typeof window === "undefined") {
+        return () => {};
+      }
+
+      // Event handler - only trigger onChange when this key changes
+      const handleSetGlobals = (event: Event) => {
+        const customEvent = event as SetGlobalsEvent;
+        if (key in customEvent.detail.globals) {
+          onChange();
+        }
+      };
+
+      // Attach listener
+      window.addEventListener(SET_GLOBALS_EVENT_TYPE, handleSetGlobals, {
+        passive: true,
+      });
+
+      // Cleanup
+      return () => {
+        window.removeEventListener(SET_GLOBALS_EVENT_TYPE, handleSetGlobals);
+      };
+    },
+    // Get snapshot (current value)
+    () => window?.openai?.[key] ?? null,
+    // Server snapshot (SSR)
+    () => null
+  );
+};
+```
+
+**How it works:**
+
+1. **useSyncExternalStore** - React hook for subscribing to external state
+2. **Subscribe function** - Sets up event listener for `openai:set_globals` events
+3. **Selective updates** - Only triggers re-render if the specific key changed
+4. **Snapshot function** - Retrieves current value from `window.openai[key]`
+5. **SSR safe** - Returns null during server-side rendering
 
 **Available keys:**
 
@@ -115,6 +166,137 @@ function TaskWidget() {
 }
 ```
 
+## Specialized Hooks
+
+Create domain-specific hooks by wrapping `useOpenAiGlobal` for cleaner APIs.
+
+### useTheme
+
+```typescript
+type UseThemeResult = {
+  theme: "light" | "dark" | null;
+};
+
+export const useTheme = (): UseThemeResult => {
+  const chatGPTTheme = useOpenAiGlobal("theme");
+
+  return {
+    theme: chatGPTTheme,
+  };
+};
+```
+
+**Usage:**
+
+```typescript
+function ThemedComponent() {
+  const { theme } = useTheme();
+
+  return (
+    <div className={theme === "dark" ? "dark-mode" : "light-mode"}>
+      {theme ? "ChatGPT controls theme" : "Using default theme"}
+    </div>
+  );
+}
+```
+
+### useDisplayMode
+
+```typescript
+export const useDisplayMode = (): DisplayMode | null => {
+  return useOpenAiGlobal("displayMode");
+};
+```
+
+**Usage:**
+
+```typescript
+function ResponsiveWidget() {
+  const displayMode = useDisplayMode();
+  const isFullscreen = displayMode === "fullscreen";
+
+  return (
+    <div style={{ padding: isFullscreen ? "24px" : "12px" }}>
+      {/* Content adapts to display mode */}
+    </div>
+  );
+}
+```
+
+### useMaxHeight
+
+```typescript
+export const useMaxHeight = (): number | null => {
+  return useOpenAiGlobal("maxHeight");
+};
+```
+
+**Usage:**
+
+```typescript
+function ScrollableList() {
+  const maxHeight = useMaxHeight();
+
+  return (
+    <div
+      style={{
+        maxHeight: maxHeight ? `${maxHeight}px` : "auto",
+        overflow: "auto",
+      }}
+    >
+      {/* Scrollable content */}
+    </div>
+  );
+}
+```
+
+### useWidgetProps
+
+Generic hook for retrieving tool output with type safety and fallback support.
+
+```typescript
+export const useWidgetProps = <T extends UnknownObject>(
+  defaultState?: T | (() => T)
+): T => {
+  const props = useOpenAiGlobal("toolOutput") as T | null;
+
+  const fallback =
+    typeof defaultState === "function"
+      ? (defaultState as () => T)()
+      : defaultState ?? null;
+
+  return (props ?? fallback) as T;
+};
+```
+
+**Usage:**
+
+```typescript
+type KanbanProps = {
+  workspace: string;
+  columns: string[];
+  tasks: Task[];
+};
+
+function KanbanBoard() {
+  // Type-safe props with fallback
+  const props = useWidgetProps<KanbanProps>({
+    workspace: "default",
+    columns: ["Todo", "In Progress", "Done"],
+    tasks: [],
+  });
+
+  return (
+    <div>
+      <h1>{props.workspace}</h1>
+      {props.columns.map((column) => (
+        <Column key={column} name={column} tasks={props.tasks} />
+      ))}
+    </div>
+  );
+}
+```
+
 ## Hook Patterns
 
 ### Pattern 1: Subscribing to Multiple Globals
@@ -177,62 +359,6 @@ function TaskList() {
       ))}
     </div>
   );
-}
-```
-
-### Pattern 3: Lazy Initialization
-
-```typescript
-function ExpensiveWidget() {
-  // Initialize with function to avoid expensive computation on every render
-  const [state, setState] = useWidgetState(() => {
-    // Only runs once
-    const computedDefault = expensiveCalculation();
-    return {
-      cache: computedDefault,
-      timestamp: Date.now(),
-    };
-  });
-
-  return <div>{/* ... */}</div>;
-}
-```
-
-### Pattern 4: Theme-Aware Components
-
-```typescript
-function ThemedButton() {
-  const theme = useOpenAiGlobal("theme");
-
-  const styles = {
-    light: {
-      background: "#ffffff",
-      color: "#000000",
-    },
-    dark: {
-      background: "#1a1a1a",
-      color: "#ffffff",
-    },
-  };
-
-  return <button style={styles[theme || "light"]}>Click Me</button>;
-}
-```
-
-### Pattern 5: Locale-Aware Formatting
-
-```typescript
-function PriceDisplay({ amount }: { amount: number }) {
-  const locale = useOpenAiGlobal("locale");
-
-  const formatter = useMemo(() => {
-    return new Intl.NumberFormat(locale || "en-US", {
-      style: "currency",
-      currency: "USD",
-    });
-  }, [locale]);
-
-  return <span>{formatter.format(amount)}</span>;
 }
 ```
 
@@ -383,20 +509,6 @@ const [state, setState] = useWidgetState({
   selectedId: 2,
   allTasks: [...1000 tasks...], // Store in _meta instead
   fullHistory: [...] // Too large for widget state
-});
-```
-
-### Do: Use Lazy Initialization for Expensive Defaults
-
-```typescript
-// GOOD - Lazy initialization
-const [state, setState] = useWidgetState(() => ({
-  cache: computeExpensiveDefault(),
-}));
-
-// BAD - Runs on every render
-const [state, setState] = useWidgetState({
-  cache: computeExpensiveDefault(), // Recalculates unnecessarily
 });
 ```
 

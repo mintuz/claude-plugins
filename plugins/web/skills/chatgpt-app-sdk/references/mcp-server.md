@@ -15,7 +15,7 @@ ChatGPT apps consist of three layers:
 Widget templates are MCP resources with `mimeType: "text/html+skybridge"`. Reference CDN-hosted assets:
 
 ```typescript
-const CDN_BASE = process.env.WIDGET_CDN_URL || 'http://localhost:5173';
+const CDN_BASE = process.env.WIDGET_CDN_URL || "http://localhost:5173";
 
 server.registerResource(
   "kanban-widget",
@@ -45,6 +45,7 @@ server.registerResource(
 ```
 
 **Environment configuration:**
+
 - Local: `WIDGET_CDN_URL=http://localhost:5173` (Vite dev server)
 - Production: `WIDGET_CDN_URL=https://cdn.example.com` (CDN base URL)
 
@@ -71,11 +72,11 @@ server.registerTool(
       structuredContent: {
         workspace,
         taskCount: tasks.length,
-        columns: ["Todo", "In Progress", "Done"]
+        columns: ["Todo", "In Progress", "Done"],
       },
       _meta: {
-        initialData: { tasks, workspace }
-      }
+        initialData: { tasks, workspace },
+      },
     };
   }
 );
@@ -98,7 +99,7 @@ Responses include three components:
 }
 ```
 
-For widget runtime and `window.openai` usage, see `./ui-components.md`.
+For widget runtime and `window.openai` usage, see `./ui-components.md` and `./react-integration.md`.
 
 ## Best Practices
 
@@ -131,12 +132,12 @@ return {
   // Model sees this (concise)
   structuredContent: {
     summary: "Found 150 tasks",
-    topPriorities: tasks.slice(0, 3)
+    topPriorities: tasks.slice(0, 3),
   },
   // Widget sees this (comprehensive)
   _meta: {
-    initialData: { allTasks: tasks }
-  }
+    initialData: { allTasks: tasks },
+  },
 };
 ```
 
@@ -150,14 +151,16 @@ try {
   return { structuredContent: data };
 } catch (error) {
   return {
-    content: [{
-      type: "text",
-      text: "Unable to load data. Please try again."
-    }],
+    content: [
+      {
+        type: "text",
+        text: "Unable to load data. Please try again.",
+      },
+    ],
     _meta: {
       error: error.message,
-      stack: error.stack
-    }
+      stack: error.stack,
+    },
   };
 }
 ```
