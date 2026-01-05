@@ -4,109 +4,101 @@ This directory contains tools for syncing Claude plugin skills to OpenAI Codex.
 
 ## Overview
 
-The `sync-to-codex.go` script converts and copies skills from the Claude plugin marketplace to the Codex skills format, making them available for use in OpenAI's Codex CLI.
+The `codex-sync.go` script converts and copies skills from the Claude plugin marketplace to the Codex skills format, making them available for use in OpenAI's Codex CLI.
+
+**IMPORTANT:** This script must be run from the repository root directory, not from within the `scripts/` directory.
 
 ## Quick Start
 
+Run these commands from the repository root:
+
 ```bash
-# Sync all skills to ~/.codex/skills (user-level, symlink mode)
-go run sync-to-codex.go
+# Sync all skills to ~/.codex/skills (user-level)
+go run scripts/codex-sync.go
 
 # Sync to .codex/skills in current project (project-level)
-go run sync-to-codex.go --project
-
-# Use copy mode instead of symlinks
-go run sync-to-codex.go --copy
+go run scripts/codex-sync.go --project
 
 # Dry run to see what would be synced
-go run sync-to-codex.go --dry-run --verbose
+go run scripts/codex-sync.go --dry-run --verbose
 ```
 
 ## Installation
 
 ### Build the binary
 
+From the repository root:
+
 ```bash
-cd scripts
-go build -o sync-to-codex sync-to-codex.go
+go build -o codex-sync scripts/codex-sync.go
 ```
 
 ### Run directly with go run
 
+From the repository root:
+
 ```bash
-go run sync-to-codex.go [flags]
+go run scripts/codex-sync.go [flags]
 ```
 
 ## Usage
 
 ```bash
-sync-to-codex [flags]
+codex-sync [flags]
 ```
 
 ### Flags
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `--output <dir>` | Custom output directory for Codex skills | `~/.codex/skills` |
-| `--plugins <dir>` | Directory containing Claude plugins | `./plugins` |
-| `--marketplace <file>` | Path to marketplace.json | `./.claude-plugin/marketplace.json` |
-| `--project` | Install to `.codex/skills` in current directory | `false` |
-| `--prefix` | Prefix skill names with plugin name | `false` |
-| `--copy` | Copy files instead of creating symlinks | `false` |
-| `--verbose` | Enable verbose logging | `false` |
-| `--dry-run` | Show what would be synced without modifying files | `false` |
+| Flag                   | Description                                       | Default                             |
+| ---------------------- | ------------------------------------------------- | ----------------------------------- |
+| `--output <dir>`       | Custom output directory for Codex skills          | `~/.codex/skills`                   |
+| `--plugins <dir>`      | Directory containing Claude plugins               | `./plugins`                         |
+| `--marketplace <file>` | Path to marketplace.json                          | `./.claude-plugin/marketplace.json` |
+| `--project`            | Install to `.codex/skills` in current directory   | `false`                             |
+| `--prefix`             | Prefix skill names with plugin name               | `false`                             |
+| `--verbose`            | Enable verbose logging                            | `false`                             |
+| `--dry-run`            | Show what would be synced without modifying files | `false`                             |
 
 ## Examples
 
 ### User-level installation (default)
 
-Installs skills to `~/.codex/skills` for all your Codex sessions using symlinks:
+Installs skills to `~/.codex/skills` for all your Codex sessions. Run from repository root:
 
 ```bash
-go run sync-to-codex.go
+go run scripts/codex-sync.go
 ```
-
-This creates symlinks, so changes to your Claude skills automatically reflect in Codex.
 
 ### Project-level installation
 
-Installs skills to `.codex/skills` in the current repository:
+Installs skills to `.codex/skills` in the current repository. Run from repository root:
 
 ```bash
-go run sync-to-codex.go --project
+go run scripts/codex-sync.go --project
 ```
-
-### Copy mode (independent files)
-
-Use `--copy` to copy files instead of symlinking:
-
-```bash
-go run sync-to-codex.go --copy
-```
-
-Use this when:
-- You want to distribute skills independently
-- You're on a filesystem that doesn't support symlinks
-- You want to prevent changes to source skills from affecting Codex
 
 ### Custom output directory
 
+Run from repository root:
+
 ```bash
-go run sync-to-codex.go --output /path/to/custom/skills
+go run scripts/codex-sync.go --output /path/to/custom/skills
 ```
 
 ### Verbose dry run
 
-See exactly what would be synced without making changes:
+See exactly what would be synced without making changes. Run from repository root:
 
 ```bash
-go run sync-to-codex.go --dry-run --verbose
+go run scripts/codex-sync.go --dry-run --verbose
 ```
 
 ### Sync specific marketplace file
 
+Run from repository root:
+
 ```bash
-go run sync-to-codex.go --marketplace /path/to/marketplace.json
+go run scripts/codex-sync.go --marketplace /path/to/marketplace.json
 ```
 
 ## How It Works
@@ -114,34 +106,20 @@ go run sync-to-codex.go --marketplace /path/to/marketplace.json
 1. **Reads marketplace.json** - Discovers all plugins and their skills
 2. **Finds skill directories** - Locates each skill's SKILL.md and supporting files
 3. **Creates flat structure** - Skills use their original names (e.g., `commit-messages`, `react`) or prefixed names with `--prefix` flag
-4. **Symlinks by default** - Creates symlinks to skill directories (use `--copy` to copy files instead)
+4. **Copies files** - Recursively copies all skill files to the target directory
 5. **Maintains structure** - Preserves directory structure within each skill folder
 
-### Symlink vs Copy Mode
-
-**Symlink mode (default):**
-- ✅ Changes to skills automatically reflected in Codex
-- ✅ Minimal disk space usage
-- ✅ Instant sync
-- ❌ Breaks if source repo is moved/deleted
-- ❌ May not work on all filesystems (e.g., some Windows setups)
-
-**Copy mode (`--copy` flag):**
-- ✅ Independent files that won't break
-- ✅ Works on all filesystems
-- ❌ Changes require re-running sync
-- ❌ Uses more disk space
-- ❌ Duplicate files to maintain
+**Note:** Changes to source skills require re-running the sync to update the copied files in Codex.
 
 ## Skill Naming Convention
 
 By default, skills are synced with their original names (flattened structure without plugin prefix):
 
-| Claude Plugin Skill | Codex Skill Name (default) | With `--prefix` flag |
-|---------------------|----------------------------|---------------------|
-| `core:commit-messages` | `commit-messages` | `core-commit-messages` |
-| `web:react` | `react` | `web-react` |
-| `app:swift-testing` | `swift-testing` | `app-swift-testing` |
+| Claude Plugin Skill    | Codex Skill Name (default) | With `--prefix` flag   |
+| ---------------------- | -------------------------- | ---------------------- |
+| `core:commit-messages` | `commit-messages`          | `core-commit-messages` |
+| `web:react`            | `react`                    | `web-react`            |
+| `app:swift-testing`    | `swift-testing`            | `app-swift-testing`    |
 
 **Note:** All skill names are unique across plugins, so no conflicts occur with the flattened structure.
 
@@ -166,7 +144,7 @@ $app-swift-testing
 
 ## Supported Skill Features
 
-The sync tool preserves all skill features (in both symlink and copy modes):
+The sync tool preserves all skill features:
 
 - ✅ SKILL.md with YAML frontmatter
 - ✅ Reference documentation files
@@ -174,13 +152,12 @@ The sync tool preserves all skill features (in both symlink and copy modes):
 - ✅ Resource files and assets
 - ✅ Nested directory structures
 
-**Note:** In symlink mode, the entire skill directory is linked, so all files are automatically available.
-
 ## Skills Synced
 
 Based on the current marketplace configuration, the following skills will be synced (shown with default flattened names):
 
 ### Core Plugin
+
 - `commit-messages` - Git/conventional commit message guidance
 - `expectations` - Software engineering expectations and standards
 - `learn` - Learning and knowledge building
@@ -189,6 +166,7 @@ Based on the current marketplace configuration, the following skills will be syn
 - `prompt-master` - Prompt refinement and optimization
 
 ### Web Plugin
+
 - `css` - CSS best practices and modern patterns
 - `tdd` - Test-driven development for web apps
 - `react` - React architecture and patterns
@@ -199,15 +177,18 @@ Based on the current marketplace configuration, the following skills will be syn
 - `chatgpt-app-sdk` - ChatGPT app SDK integration
 
 ### App Plugin
+
 - `swift-testing` - Swift testing with Swift Testing framework
 - `app-intent-driven-development` - App Intent-first iOS development
 - `swiftui-architecture` - SwiftUI architecture patterns
 - `debug` - iOS debugging techniques
 
 ### Product Management Plugin
+
 - `status-updates` - Status update creation and formatting
 
 ### Life Plugin
+
 - `gps-method` - Personal goal achievement methodology
 
 **Note:** Use the `--prefix` flag to add plugin prefixes (e.g., `core-commit-messages` instead of `commit-messages`)
@@ -249,7 +230,7 @@ chmod 755 .codex
 
 ```
 scripts/
-├── sync-to-codex.go    # Main sync script
+├── codex-sync.go       # Main sync script
 ├── go.mod              # Go module definition
 └── README.md           # This file
 ```
@@ -266,10 +247,10 @@ The script consists of several key functions:
 
 ### Testing
 
-Run a dry run to test without modifying files:
+Run a dry run to test without modifying files. From repository root:
 
 ```bash
-go run sync-to-codex.go --dry-run --verbose
+go run scripts/codex-sync.go --dry-run --verbose
 ```
 
 ## References
