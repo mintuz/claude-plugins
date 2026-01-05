@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Agents and skills that are specialised in building and maintaining web applications",
   "author": {
     "name": "Adam Bulmer",
