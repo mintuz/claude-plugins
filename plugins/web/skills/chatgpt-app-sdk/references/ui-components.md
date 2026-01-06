@@ -7,9 +7,9 @@
 Subscribe to individual `window.openai` properties:
 
 ```typescript
-const theme = useOpenAiGlobal('theme');
-const displayMode = useOpenAiGlobal('displayMode');
-const locale = useOpenAiGlobal('locale');
+const theme = useOpenAiGlobal("theme");
+const displayMode = useOpenAiGlobal("displayMode");
+const locale = useOpenAiGlobal("locale");
 ```
 
 Components automatically re-render when subscribed values change.
@@ -21,7 +21,7 @@ Manage persisted UI state:
 ```typescript
 const [uiState, setUiState] = useWidgetState({
   selectedId: null,
-  sortBy: 'status'
+  sortBy: "status",
 });
 ```
 
@@ -50,39 +50,66 @@ app/
 **Vite configuration:**
 
 ```typescript
+
+function privateNetworkAccess(): Plugin {
+  return {
+    name: 'private-network-access',
+    configureServer(server) {
+      server.middlewares.use((_req, res, next) => {
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.setHeader('Access-Control-Allow-Private-Network', 'true')
+        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        res.setHeader('Access-Control-Allow-Headers', '*')
+        next()
+      })
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use((_req, res, next) => {
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.setHeader('Access-Control-Allow-Private-Network', 'true')
+        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        res.setHeader('Access-Control-Allow-Headers', '*')
+        next()
+      })
+    }
+  }
+}
+
 // vite.config.ts
 export default {
+  plugins: [react(), privateNetworkAccess()],
   build: {
     rollupOptions: {
       output: {
-        entryFileNames: 'widget.js',
-        assetFileNames: 'widget.css'
-      }
-    }
+        entryFileNames: "widget.js",
+        assetFileNames: "widget.css",
+      },
+    },
+  },
+  preview: {
+    cors: true,
   },
   server: {
-    cors: {
-      origin: 'https://chatgpt.com',
-      credentials: true
-    }
-  }
+    cors: true,
+  },
 };
 ```
 
 **Reference CDN files from MCP server:**
 
 ```typescript
-const CDN_BASE = process.env.WIDGET_CDN_URL || 'http://localhost:5173';
+const CDN_BASE = process.env.WIDGET_CDN_URL || "http://localhost:5173";
 
 server.registerResource(
   "kanban-widget",
   "ui://widget/kanban.html",
   {},
   async () => ({
-    contents: [{
-      uri: "ui://widget/kanban.html",
-      mimeType: "text/html+skybridge",
-      text: `
+    contents: [
+      {
+        uri: "ui://widget/kanban.html",
+        mimeType: "text/html+skybridge",
+        text: `
         <!DOCTYPE html>
         <html>
           <head>
@@ -93,18 +120,21 @@ server.registerResource(
             <script type="module" src="${CDN_BASE}/widget.js"></script>
           </body>
         </html>
-      `
-    }]
+      `,
+      },
+    ],
   })
 );
 ```
 
 **Local development:**
+
 - Run `vite` in widget directory (typically port 5173)
 - Configure CORS headers to allow `https://chatgpt.com`
 - Set `WIDGET_CDN_URL=http://localhost:5173` for MCP server
 
 **Production deployment:**
+
 - Build: `vite build` → generates `dist/widget.js` and `dist/widget.css`
 - Deploy `dist/` to CDN with stable file names
 - Set `WIDGET_CDN_URL` to production CDN base URL
