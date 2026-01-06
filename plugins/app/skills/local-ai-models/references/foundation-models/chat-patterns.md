@@ -30,7 +30,7 @@ class ChatViewModel {
     func initialize() async throws {
         let systemModel = SystemLanguageModel.default
         guard systemModel.isAvailable else {
-            throw ChatError.notAvailable
+            throw ChatError.notAvailable(reason: "Apple Intelligence isn't available on this device.")
         }
 
         session = LanguageModelSession()
@@ -152,7 +152,7 @@ class ConversationManager {
     func startConversation() async throws {
         let systemModel = SystemLanguageModel.default
         guard systemModel.isAvailable else {
-            throw ChatError.notAvailable
+            throw ChatError.notAvailable(reason: "Apple Intelligence isn't available on this device.")
         }
 
         // Create once and keep for conversation

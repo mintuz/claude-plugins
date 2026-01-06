@@ -335,10 +335,10 @@ func send(_ text: String) async throws {
 
 ## Common Errors and Solutions
 
-| Error                         | Cause                                 | Solution                                           |
-| ---------------------------- | ------------------------------------- | -------------------------------------------------- |
-| Model Unavailable            | Apple Intelligence off or unsupported | Check availability, show fallback UI               |
-| Assets Unavailable           | Model assets removed or not ready     | Retry later or re-check availability               |
-| Guardrail Violation / Refusal| Sensitive or disallowed content       | Present refusal message and safe fallback          |
-| Exceeded Context Window      | Prompt too long or session too large  | Shorten prompt or start a new session              |
-| Unsupported Language         | Locale not supported                  | Check supportsLocale(_:) and prompt for fallback   |
+| Error                         | Cause                                 | Solution                                          |
+| ----------------------------- | ------------------------------------- | ------------------------------------------------- |
+| Model Unavailable             | Apple Intelligence off or unsupported | Check availability, show fallback UI              |
+| Assets Unavailable            | Model assets removed or not ready     | Retry later or re-check availability              |
+| Guardrail Violation / Refusal | Sensitive or disallowed content       | Present refusal message and safe fallback         |
+| Exceeded Context Window       | Prompt too long or session too large  | Shorten prompt or start a new session             |
+| Unsupported Language          | Locale not supported                  | Check supportsLocale(\_:) and prompt for fallback |
