@@ -22,10 +22,10 @@ Production-ready guide for implementing on-device AI models in iOS apps using Ap
 
 1. **Availability First** - Always check model availability before initialization
 2. **Stream Responses** - Provide progressive UI updates for better UX
-3. **Session Persistence** - Reuse ChatSession for multi-turn conversations (Foundation Models)
+3. **Session Persistence** - Reuse LanguageModelSession for multi-turn conversations (Foundation Models)
 4. **Memory Awareness** - Use quantized models and monitor memory usage
 5. **Async Everything** - Load models asynchronously, never block the main thread
-6. **Locale Support** - Specify locale for Foundation Models internationalization
+6. **Locale Support** - Use supportsLocale(_:) and locale instructions for Foundation Models
 
 ## Quick Reference
 
@@ -66,10 +66,9 @@ Production-ready guide for implementing on-device AI models in iOS apps using Ap
 
 ```
 Do you need advanced features like:
-- Tool/function calling
 - Vision Language Models (VLMs)
 - Image generation
-- Custom models beyond registry
+- Custom models beyond the system model
 ├── Yes → MLX Swift (references/mlx-swift/)
 └── No → Is this a standard chat interface?
     ├── Yes → Foundation Models (simpler, recommended)
@@ -109,7 +108,7 @@ Is this model shared across features?
 
 ```
 Foundation Models:
-└── Reuse ChatSession for context
+└── Reuse LanguageModelSession for context
     (references/foundation-models/chat-patterns.md #multi-turn)
 
 MLX Swift:

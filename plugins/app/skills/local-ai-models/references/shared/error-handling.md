@@ -1,59 +1,100 @@
 # Error Handling
 
-Comprehensive error handling for on-device AI models.
+Comprehensive error handling for on-device AI models (Foundation Models + MLX Swift).
+
+## Foundation Models Error Sources
+
+- Availability: `SystemLanguageModel.default.availability`
+- Generation: `LanguageModelSession.GenerationError.*`
 
 ## Error Types
 
 ```swift
 enum AIModelError: Error {
-    case modelNotAvailable
-    case modelNotLoaded
-    case generationFailed(String)
+    case modelUnavailable
     case sessionNotInitialized
-    case unsupportedLocale(Locale)
-    case memoryLimitExceeded
-    case invalidInput(String)
-    case downloadFailed
-    case networkError(Error)
+    case guardrailViolation
+    case refusal(String?)
+    case exceededContextWindow
+    case assetsUnavailable
+    case rateLimited
+    case concurrentRequests
+    case unsupportedGuide
+    case unsupportedLanguageOrLocale
+    case decodingFailure
+    case generationFailed(String)
 }
 
 extension AIModelError: LocalizedError {
     var errorDescription: String? {
         switch self {
-        case .modelNotAvailable:
-            return "AI model is not available on this device"
-        case .modelNotLoaded:
-            return "Model failed to load"
+        case .modelUnavailable:
+            return "Apple Intelligence isn't available on this device."
+        case .sessionNotInitialized:
+            return "Model session not initialized."
+        case .guardrailViolation:
+            return "This request isn't allowed."
+        case .refusal(let message):
+            return message ?? "The model refused this request."
+        case .exceededContextWindow:
+            return "The request is too long."
+        case .assetsUnavailable:
+            return "Model assets are unavailable right now."
+        case .rateLimited:
+            return "Too many requests. Try again later."
+        case .concurrentRequests:
+            return "Please wait for the current response to finish."
+        case .unsupportedGuide:
+            return "This structured output isn't supported."
+        case .unsupportedLanguageOrLocale:
+            return "The requested language isn't supported."
+        case .decodingFailure:
+            return "The response couldn't be decoded."
         case .generationFailed(let reason):
             return "Text generation failed: \(reason)"
-        case .sessionNotInitialized:
-            return "Chat session not initialized"
-        case .unsupportedLocale(let locale):
-            return "Language '\(locale.identifier)' is not supported"
-        case .memoryLimitExceeded:
-            return "Insufficient memory for model"
-        case .invalidInput(let reason):
-            return "Invalid input: \(reason)"
-        case .downloadFailed:
-            return "Failed to download model"
-        case .networkError(let error):
-            return "Network error: \(error.localizedDescription)"
         }
     }
 
     var recoverySuggestion: String? {
         switch self {
-        case .modelNotAvailable:
-            return "This feature requires iOS 18.0+ and a compatible device"
-        case .modelNotLoaded:
-            return "Try restarting the app or check your network connection"
-        case .memoryLimitExceeded:
-            return "Close other apps or try a smaller model"
-        case .downloadFailed:
-            return "Check your internet connection and try again"
+        case .modelUnavailable:
+            return "Enable Apple Intelligence in Settings or use a supported device."
+        case .exceededContextWindow:
+            return "Try a shorter prompt or start a new session."
+        case .assetsUnavailable:
+            return "Free up space and try again."
+        case .unsupportedLanguageOrLocale:
+            return "Switch to a supported language."
         default:
             return nil
         }
+    }
+}
+```
+
+## Mapping Foundation Models Errors
+
+```swift
+func mapGenerationError(_ error: LanguageModelSession.GenerationError) async -> AIModelError {
+    switch error {
+    case .guardrailViolation:
+        return .guardrailViolation
+    case .refusal(let refusal, _):
+        return .refusal(try? await refusal.explanation)
+    case .exceededContextWindowSize:
+        return .exceededContextWindow
+    case .assetsUnavailable:
+        return .assetsUnavailable
+    case .rateLimited:
+        return .rateLimited
+    case .concurrentRequests:
+        return .concurrentRequests
+    case .unsupportedGuide:
+        return .unsupportedGuide
+    case .unsupportedLanguageOrLocale:
+        return .unsupportedLanguageOrLocale
+    case .decodingFailure:
+        return .decodingFailure
     }
 }
 ```
@@ -67,12 +108,31 @@ extension AIModelError: LocalizedError {
 class ErrorHandlingViewModel {
     var error: AIModelError?
     var isShowingError = false
+    private var session: LanguageModelSession?
+
+    func initialize() {
+        let model = SystemLanguageModel.default
+        guard model.isAvailable else {
+            error = .modelUnavailable
+            isShowingError = true
+            return
+        }
+
+        session = LanguageModelSession()
+    }
 
     func send(_ text: String) async {
         do {
-            try await session.send(text)
+            guard let session else {
+                throw AIModelError.sessionNotInitialized
+            }
+
+            _ = try await session.respond(to: text)
         } catch let error as AIModelError {
             self.error = error
+            isShowingError = true
+        } catch let error as LanguageModelSession.GenerationError {
+            self.error = await mapGenerationError(error)
             isShowingError = true
         } catch {
             self.error = .generationFailed(error.localizedDescription)
@@ -80,52 +140,36 @@ class ErrorHandlingViewModel {
         }
     }
 }
-
-struct ErrorHandlingView: View {
-    @State private var viewModel = ErrorHandlingViewModel()
-
-    var body: some View {
-        VStack {
-            // Content
-        }
-        .alert("Error", isPresented: $viewModel.isShowingError, presenting: viewModel.error) { error in
-            Button("OK") {
-                viewModel.error = nil
-            }
-        } message: { error in
-            VStack {
-                Text(error.localizedDescription)
-                if let suggestion = error.recoverySuggestion {
-                    Text(suggestion)
-                        .font(.caption)
-                }
-            }
-        }
-    }
-}
 ```
 
-### Pattern 2: Retry Logic
+### Pattern 2: Retry Only When Appropriate
 
 ```swift
 @Observable
 class RetryableViewModel {
-    private let maxRetries = 3
+    private let maxRetries = 2
+    private var session: LanguageModelSession?
 
     func sendWithRetry(_ text: String) async throws {
         var lastError: Error?
 
         for attempt in 1...maxRetries {
             do {
-                return try await session.send(text)
+                guard let session else {
+                    throw AIModelError.sessionNotInitialized
+                }
+                _ = try await session.respond(to: text)
+                return
+            } catch let error as LanguageModelSession.GenerationError {
+                lastError = error
+                if case .assetsUnavailable = error, attempt < maxRetries {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                    continue
+                }
+                throw await mapGenerationError(error)
             } catch {
                 lastError = error
-
-                if attempt < maxRetries {
-                    // Exponential backoff
-                    let delay = pow(2.0, Double(attempt))
-                    try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-                }
+                break
             }
         }
 
@@ -139,38 +183,29 @@ class RetryableViewModel {
 ```swift
 @Observable
 class GracefulDegradationService {
-    private var session: ChatSession?
+    private var session: LanguageModelSession?
 
-    func initialize() async {
-        // Try to initialize, but don't fail if unavailable
-        let availability = await ChatSession.availability
-
-        switch availability {
+    func initialize() {
+        let model = SystemLanguageModel.default
+        switch model.availability {
         case .available:
-            session = ChatSession(locale: .current)
-
-        case .downloading:
-            // Wait for download or show message
-            print("Model is downloading...")
-
-        case .notAvailable:
-            // Provide fallback or show feature unavailable
-            print("Model not available - feature disabled")
+            session = LanguageModelSession()
+        case .unavailable(.modelNotReady):
+            // Model downloading
+            session = nil
+        case .unavailable:
+            // Provide fallback UI
+            session = nil
         }
     }
 
     func send(_ text: String) async throws -> String? {
         guard let session else {
-            // Gracefully handle missing session
-            return "AI features are not available on this device"
+            return "AI features are not available on this device."
         }
 
-        // Proceed with generation
-        var response = ""
-        for try await chunk in session.send(text) {
-            response += chunk
-        }
-        return response
+        let response = try await session.respond(to: text)
+        return response.content
     }
 }
 ```
@@ -180,20 +215,18 @@ class GracefulDegradationService {
 ```swift
 @Observable
 class RecoverableViewModel {
-    private var session: ChatSession?
+    private var session: LanguageModelSession?
 
     func send(_ text: String) async throws {
         do {
             try await attemptSend(text)
         } catch AIModelError.sessionNotInitialized {
-            // Try to recover by reinitializing
-            try await reinitialize()
+            initialize()
             try await attemptSend(text)
-        } catch AIModelError.memoryLimitExceeded {
-            // Clear memory and retry with smaller context
-            try await clearMemoryAndRetry(text)
+        } catch AIModelError.assetsUnavailable {
+            initialize()
+            try await attemptSend(text)
         } catch {
-            // Unrecoverable error
             throw error
         }
     }
@@ -203,25 +236,16 @@ class RecoverableViewModel {
             throw AIModelError.sessionNotInitialized
         }
 
-        for try await _ in session.send(text) {
-            // Process chunks
+        _ = try await session.respond(to: text)
+    }
+
+    private func initialize() {
+        let model = SystemLanguageModel.default
+        guard model.isAvailable else {
+            session = nil
+            return
         }
-    }
-
-    private func reinitialize() async throws {
-        session = ChatSession(locale: .current)
-    }
-
-    private func clearMemoryAndRetry(_ text: String) async throws {
-        // Release resources
-        session = nil
-
-        // Wait for memory to clear
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-
-        // Reinitialize and retry
-        try await reinitialize()
-        try await attemptSend(text)
+        session = LanguageModelSession()
     }
 }
 ```
@@ -256,53 +280,6 @@ struct ErrorAlertView: View {
 }
 ```
 
-### Content Unavailable
-
-```swift
-struct UnavailableView: View {
-    let error: AIModelError
-
-    var body: some View {
-        ContentUnavailableView(
-            "Feature Unavailable",
-            systemImage: "exclamationmark.triangle",
-            description: Text(error.localizedDescription)
-        )
-    }
-}
-```
-
-### Inline Error
-
-```swift
-struct InlineErrorView: View {
-    let error: AIModelError?
-
-    var body: some View {
-        if let error {
-            HStack {
-                Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundColor(.red)
-
-                VStack(alignment: .leading) {
-                    Text(error.localizedDescription)
-                        .font(.caption)
-
-                    if let suggestion = error.recoverySuggestion {
-                        Text(suggestion)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-            .padding()
-            .background(Color.red.opacity(0.1))
-            .cornerRadius(8)
-        }
-    }
-}
-```
-
 ## Validation
 
 ### Input Validation
@@ -310,23 +287,13 @@ struct InlineErrorView: View {
 ```swift
 func validateInput(_ text: String) throws {
     guard !text.isEmpty else {
-        throw AIModelError.invalidInput("Message cannot be empty")
+        throw AIModelError.generationFailed("Message cannot be empty")
     }
 
-    guard text.count <= 4096 else {
-        throw AIModelError.invalidInput("Message too long (max 4096 characters)")
+    // Keep prompts reasonably short to avoid context window errors.
+    guard text.count <= 2000 else {
+        throw AIModelError.exceededContextWindow
     }
-
-    // Check for valid UTF-8
-    guard text.utf8.count == text.count else {
-        throw AIModelError.invalidInput("Invalid characters in message")
-    }
-}
-
-// Usage
-func send(_ text: String) async throws {
-    try validateInput(text)
-    // Proceed with sending
 }
 ```
 
@@ -334,12 +301,8 @@ func send(_ text: String) async throws {
 
 ```swift
 func validateLocale(_ locale: Locale) throws {
-    let supportedLocales: Set<String> = [
-        "en", "es", "fr", "de", "it", "pt", "ja", "ko", "zh"
-    ]
-
-    guard supportedLocales.contains(locale.languageCode ?? "") else {
-        throw AIModelError.unsupportedLocale(locale)
+    guard SystemLanguageModel.default.supportsLocale(locale) else {
+        throw AIModelError.unsupportedLanguageOrLocale
     }
 }
 ```
@@ -356,13 +319,13 @@ extension Logger {
     )
 }
 
-// Usage
 func send(_ text: String) async throws {
     Logger.aiModel.info("Sending message: \(text.prefix(50))...")
 
     do {
-        try await session.send(text)
+        let response = try await session.respond(to: text)
         Logger.aiModel.info("Message sent successfully")
+        _ = response.content
     } catch {
         Logger.aiModel.error("Failed to send message: \(error.localizedDescription)")
         throw error
@@ -370,57 +333,12 @@ func send(_ text: String) async throws {
 }
 ```
 
-## Best Practices
-
-### DO:
-
-- ✅ Provide clear, actionable error messages
-- ✅ Suggest recovery actions when possible
-- ✅ Log errors for debugging
-- ✅ Handle errors at appropriate levels
-- ✅ Validate input before processing
-- ✅ Implement retry logic for transient errors
-
-### DON'T:
-
-- ❌ Silently swallow errors
-- ❌ Show technical error messages to users
-- ❌ Retry indefinitely
-- ❌ Crash on recoverable errors
-- ❌ Ignore user's language/locale
-- ❌ Block UI during error handling
-
 ## Common Errors and Solutions
 
-| Error                   | Cause                         | Solution                                           |
-| ----------------------- | ----------------------------- | -------------------------------------------------- |
-| Model Not Available     | Device doesn't support models | Check availability, show fallback UI               |
-| Memory Exceeded         | Model too large for device    | Use 4-bit quantized models, add memory entitlement |
-| Session Not Initialized | Forgot to initialize          | Always check before use, implement recovery        |
-| Download Failed         | Network issues                | Retry with backoff, show progress                  |
-| Invalid Input           | Malformed prompt              | Validate input, show clear error message           |
-
-## Testing Error Handling
-
-```swift
-@Test
-func testErrorHandling() async throws {
-    let viewModel = ChatViewModel()
-
-    // Test model not available
-    do {
-        try await viewModel.send("Hello")
-        Issue.record("Expected error")
-    } catch AIModelError.modelNotAvailable {
-        // Expected error
-    }
-
-    // Test invalid input
-    do {
-        try await viewModel.send("")
-        Issue.record("Expected error")
-    } catch AIModelError.invalidInput {
-        // Expected error
-    }
-}
-```
+| Error                         | Cause                                 | Solution                                           |
+| ---------------------------- | ------------------------------------- | -------------------------------------------------- |
+| Model Unavailable            | Apple Intelligence off or unsupported | Check availability, show fallback UI               |
+| Assets Unavailable           | Model assets removed or not ready     | Retry later or re-check availability               |
+| Guardrail Violation / Refusal| Sensitive or disallowed content       | Present refusal message and safe fallback          |
+| Exceeded Context Window      | Prompt too long or session too large  | Shorten prompt or start a new session              |
+| Unsupported Language         | Locale not supported                  | Check supportsLocale(_:) and prompt for fallback   |

@@ -9,7 +9,7 @@ Production-ready practices for on-device AI models (Foundation Models & MLX Swif
 - ✅ Reuse sessions for multi-turn conversations (Foundation Models)
 - ✅ Check availability before creating sessions
 - ✅ Handle all availability states in UI
-- ✅ Use locale parameter for internationalization
+- ✅ Use supportsLocale(_:) and locale instructions for internationalization
 - ✅ Create session once per conversation
 
 ### DON'T:
@@ -22,15 +22,15 @@ Production-ready practices for on-device AI models (Foundation Models & MLX Swif
 ```swift
 // ❌ DON'T: Creates new session each time
 func send(_ text: String) async {
-    let session = ChatSession(locale: .current) // Loses context!
+    let session = LanguageModelSession() // Loses context!
     // ...
 }
 
 // ✅ DO: Reuse session
-private var session: ChatSession?
+private var session: LanguageModelSession?
 
 func initialize() async {
-    session = ChatSession(locale: .current) // Create once
+    session = LanguageModelSession() // Create once
 }
 
 func send(_ text: String) async {
@@ -147,36 +147,30 @@ struct LoadingView: View {
 - ❌ Ignore topP and temperature interactions
 
 ```swift
-// Parameter presets for common use cases
+// Foundation Models presets using GenerationOptions
 enum GenerationPreset {
     case factual
     case balanced
     case creative
 
-    var parameters: GenerateParameters {
+    var options: GenerationOptions {
         switch self {
         case .factual:
-            return GenerateParameters(
-                temperature: 0.2,
-                topP: 0.9,
-                maxTokens: 256
-            )
+            return GenerationOptions(temperature: 0.2, maximumResponseTokens: 256)
         case .balanced:
-            return GenerateParameters(
-                temperature: 0.7,
-                topP: 0.9,
-                maxTokens: 512
-            )
+            return GenerationOptions(temperature: 0.7, maximumResponseTokens: 512)
         case .creative:
-            return GenerateParameters(
-                temperature: 1.0,
-                topP: 0.95,
-                maxTokens: 1024
-            )
+            return GenerationOptions(temperature: 1.0, maximumResponseTokens: 1024)
         }
     }
 }
+
+// Example usage
+let options = GenerationPreset.balanced.options
+let response = try await session.respond(to: prompt, options: options)
 ```
+
+For MLX Swift, use its `GenerateParameters` (temperature, topP, maxTokens) in the MLX-specific references.
 
 ## SwiftUI Integration
 
@@ -208,7 +202,7 @@ class ChatViewModel {
 
         // Stream updates automatically refresh UI
         var response = ""
-        for try await chunk in session.send(text) {
+        for try await chunk in session.streamResponse(to: text) {
             response += chunk
             // @Observable triggers UI updates
         }
@@ -233,7 +227,7 @@ struct ChatView: View {
 
 ### DO:
 
-- ✅ Specify locale when creating sessions (Foundation Models)
+- ✅ Validate locale with supportsLocale(_:)
 - ✅ Test with multiple languages
 - ✅ Maintain session for consistent language
 - ✅ Support all device-supported locales
@@ -247,14 +241,14 @@ struct ChatView: View {
 
 ```swift
 // ✅ Good: Locale-aware initialization
-let session = ChatSession(locale: Locale.current) // User's locale
-
-// Support language switching
-func switchLanguage(to locale: Locale) async throws {
-    // Create new session with new locale
-    session = ChatSession(locale: locale)
-    // Note: Clears conversation history
+let locale = Locale.current
+guard SystemLanguageModel.default.supportsLocale(locale) else {
+    // Provide fallback UI
+    return
 }
+
+let instructions = "The person's locale is \(locale.identifier)."
+let session = LanguageModelSession(instructions: instructions)
 ```
 
 ## Performance Optimization
@@ -310,12 +304,12 @@ actor BatchProcessor {
 
 ```swift
 // ❌ BAD: Waiting for entire response
-let response = try await session.send(message)
-updateUI(response) // User sees nothing until complete
+let response = try await session.respond(to: message)
+updateUI(response.content) // User sees nothing until complete
 
 // ✅ GOOD: Stream incrementally
 var response = ""
-for try await chunk in session.send(message) {
+for try await chunk in session.streamResponse(to: message) {
     response += chunk
     updateUI(response) // User sees progress
 }
@@ -339,7 +333,7 @@ model = nil // Release before loading next
 ```swift
 // ❌ BAD: Creating new session loses context
 func switchLanguage() {
-    session = ChatSession(locale: newLocale) // Loses history
+    session = LanguageModelSession(instructions: "The person's locale is \(newLocale.identifier).")
 }
 
 // ✅ GOOD: Inform user and handle appropriately
@@ -348,7 +342,7 @@ func switchLanguage() {
     let savedHistory = messages
 
     // Create new session
-    session = ChatSession(locale: newLocale)
+    session = LanguageModelSession(instructions: "The person's locale is \(newLocale.identifier).")
 
     // Optionally: Show alert that history was cleared
 }

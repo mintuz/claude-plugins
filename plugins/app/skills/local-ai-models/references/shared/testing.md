@@ -55,11 +55,11 @@ struct ModelLoadingTests {
 ```swift
 @Suite("Session Management")
 struct SessionTests {
-    @Test("Create session with locale")
+    @Test("Create session")
     func testSessionCreation() async throws {
         let manager = ConversationManager()
 
-        try await manager.startConversation(locale: .current)
+        try await manager.startConversation()
 
         #expect(manager.hasActiveSession)
     }
@@ -251,7 +251,7 @@ func getMemoryUsage() -> UInt64 {
 // Run these tests only on physical devices
 @Test("Device-only: Model availability", .requiresDevice)
 func testModelAvailabilityOnDevice() async throws {
-    let availability = await ChatSession.availability
+    let availability = SystemLanguageModel.default.availability
 
     // Should be available on supported devices
     #expect(availability == .available || availability == .downloading)
@@ -278,8 +278,11 @@ func testReleasePerformance() async throws {
 struct LocalizationTests {
     @Test("Support English")
     func testEnglishLocale() async throws {
+        let locale = Locale(identifier: "en")
+        #expect(SystemLanguageModel.default.supportsLocale(locale))
+
         let manager = ConversationManager()
-        try await manager.startConversation(locale: Locale(identifier: "en"))
+        try await manager.startConversation()
 
         try await manager.send("Hello")
 
@@ -288,8 +291,11 @@ struct LocalizationTests {
 
     @Test("Support Spanish")
     func testSpanishLocale() async throws {
+        let locale = Locale(identifier: "es")
+        #expect(SystemLanguageModel.default.supportsLocale(locale))
+
         let manager = ConversationManager()
-        try await manager.startConversation(locale: Locale(identifier: "es"))
+        try await manager.startConversation()
 
         try await manager.send("Hola")
 

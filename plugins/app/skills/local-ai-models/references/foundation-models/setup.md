@@ -4,32 +4,9 @@ Setup guide for Apple's Foundation Models framework.
 
 ## Requirements
 
-### Minimum iOS Version
+### Platform Requirements
 
-```swift
-// Project Settings
-Minimum Deployment Target: iOS 26.0+
-```
-
-Foundation Models requires iOS 26.0 or later.
-
-### Increased Memory Limit
-
-Required for models larger than 1GB.
-
-**Steps:**
-
-1. Open project settings in Xcode
-2. Select your target
-3. Go to "Signing & Capabilities"
-4. Click "+ Capability"
-5. Add "Increased Memory Limit"
-
-```xml
-<!-- Appears in entitlements file -->
-<key>com.apple.developer.kernel.increased-memory-limit</key>
-<true/>
-```
+Foundation Models requires Apple Intelligence on a supported device. Always check availability at runtime and provide a fallback UI when unavailable.
 
 ## Framework Import
 
@@ -37,26 +14,41 @@ Required for models larger than 1GB.
 import FoundationModels
 ```
 
-No package dependencies needed - Foundation Models is built into iOS 26.0+.
+No package dependencies needed - Foundation Models is built into supported iOS versions.
 
 ## Checking Availability
 
 ALWAYS check model availability before use.
 
 ```swift
-let availability = await ChatSession.availability
+let systemModel = SystemLanguageModel.default
 
-switch availability {
+// Simple availability check
+guard systemModel.isAvailable else {
+    print("Model not available")
+    return
+}
+
+// Or detailed availability checking
+switch systemModel.availability {
 case .available:
     // Model ready to use
     print("Model is available")
 
-case .downloading(let progress):
-    // Model is downloading (0.0 to 1.0)
-    print("Downloading: \(Int(progress * 100))%")
+case .unavailable(.modelNotReady):
+    // Model is still downloading
+    print("Model is downloading")
 
-case .notAvailable:
-    // Model not available on this device
+case .unavailable(.appleIntelligenceNotEnabled):
+    // Apple Intelligence disabled in Settings
+    print("Apple Intelligence not enabled")
+
+case .unavailable(.deviceNotEligible):
+    // Device doesn't support Apple Intelligence
+    print("Device not eligible")
+
+case .unavailable:
+    // Other unavailability reason
     print("Model not available")
 }
 ```
@@ -65,32 +57,38 @@ case .notAvailable:
 
 ```swift
 struct ChatAvailabilityView: View {
-    @State private var availability: ChatSession.Availability = .notAvailable
+    @State private var isAvailable = false
+    @State private var availabilityStatus: String = "Checking..."
 
     var body: some View {
         Group {
-            switch availability {
-            case .available:
+            if isAvailable {
                 ChatInterface()
-
-            case .downloading(let progress):
-                VStack {
-                    Text("Downloading model...")
-                    ProgressView(value: progress)
-                    Text("\(Int(progress * 100))%")
-                }
-
-            case .notAvailable:
+            } else {
                 ContentUnavailableView(
                     "Model Not Available",
                     systemImage: "brain",
-                    description: Text("This device doesn't support on-device AI models")
+                    description: Text(availabilityStatus)
                 )
             }
         }
         .task {
             // Check on view appear
-            availability = await ChatSession.availability
+            let systemModel = SystemLanguageModel.default
+            isAvailable = systemModel.isAvailable
+
+            if !isAvailable {
+                switch systemModel.availability {
+                case .unavailable(.modelNotReady):
+                    availabilityStatus = "Model is downloading. Please try again later."
+                case .unavailable(.appleIntelligenceNotEnabled):
+                    availabilityStatus = "Please enable Apple Intelligence in Settings"
+                case .unavailable(.deviceNotEligible):
+                    availabilityStatus = "This device doesn't support on-device AI models"
+                default:
+                    availabilityStatus = "Model not available"
+                }
+            }
         }
     }
 }
@@ -99,14 +97,11 @@ struct ChatAvailabilityView: View {
 ## Creating a Session
 
 ```swift
-// With current locale (recommended)
-let session = ChatSession(locale: Locale.current)
+// Basic session creation
+let session = LanguageModelSession()
 
-// With specific locale
-let session = ChatSession(locale: Locale(identifier: "es"))
-
-// English (US)
-let session = ChatSession(locale: Locale(identifier: "en_US"))
+// Note: Sessions use the system locale automatically.
+// Use supportsLocale(_:) before prompting in a specific locale.
 ```
 
 ## Complete Setup Example
@@ -117,30 +112,54 @@ import FoundationModels
 
 @Observable
 class ChatService {
-    private var session: ChatSession?
-    var availability: ChatSession.Availability = .notAvailable
+    private var session: LanguageModelSession?
+    var isAvailable = false
     var isReady: Bool {
-        availability == .available && session != nil
+        isAvailable && session != nil
     }
 
     func initialize() async {
         // Check availability
-        availability = await ChatSession.availability
+        let systemModel = SystemLanguageModel.default
+        isAvailable = systemModel.isAvailable
 
-        guard availability == .available else {
+        guard isAvailable else {
             return
         }
 
-        // Create session with locale
-        session = ChatSession(locale: Locale.current)
+        // Create session
+        session = LanguageModelSession()
     }
 
-    func send(_ message: String) async throws -> AsyncThrowingStream<String, Error> {
+    func send(_ message: String) async throws -> String {
         guard let session else {
             throw ChatError.sessionNotInitialized
         }
 
-        return session.send(message)
+        let response = try await session.respond(to: message)
+        return response.content
+    }
+
+    func sendStreaming(_ message: String) -> AsyncThrowingStream<String, Error> {
+        AsyncThrowingStream { continuation in
+            Task {
+                guard let session else {
+                    continuation.finish(throwing: ChatError.sessionNotInitialized)
+                    return
+                }
+
+                do {
+                    let stream = session.streamResponse(to: message)
+
+                    for try await chunk in stream {
+                        continuation.yield(chunk)
+                    }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+        }
     }
 }
 
@@ -149,14 +168,9 @@ struct ChatApp: View {
 
     var body: some View {
         Group {
-            switch chatService.availability {
-            case .available:
+            if chatService.isAvailable {
                 ChatView(service: chatService)
-
-            case .downloading(let progress):
-                DownloadView(progress: progress)
-
-            case .notAvailable:
+            } else {
                 UnavailableView()
             }
         }
@@ -183,22 +197,35 @@ CRITICAL: Always test on physical devices.
 
 **Recommended devices:**
 
-- iPhone 15 Pro or later (best performance)
-- iPad Pro M1 or later
-- Minimum: iPhone 12 or later with iOS 26.0+
+- Test on Apple Intelligence supported devices
+- Verify availability states on devices with Apple Intelligence disabled
 
 ## Common Issues
 
 ### "Model Not Available" Error
 
-**Cause:** Device doesn't support models or model not downloaded yet
+**Cause:** Device doesn't support models, Apple Intelligence not enabled, or model not ready yet
 
 **Solution:**
 
 ```swift
 // Always check before use
-guard await ChatSession.availability == .available else {
-    // Show error UI
+let systemModel = SystemLanguageModel.default
+guard systemModel.isAvailable else {
+    // Show error UI based on specific reason
+    switch systemModel.availability {
+    case .unavailable(.modelNotReady):
+        // Model downloading
+        break
+    case .unavailable(.appleIntelligenceNotEnabled):
+        // Prompt user to enable in Settings
+        break
+    case .unavailable(.deviceNotEligible):
+        // Device doesn't support
+        break
+    default:
+        break
+    }
     return
 }
 ```
@@ -215,32 +242,42 @@ guard await ChatSession.availability == .available else {
 
 ### Slow Model Loading
 
-**Cause:** First-time model download
+**Cause:** First-time model download or model not ready
 
 **Solution:**
 
 ```swift
-// Handle downloading state
-case .downloading(let progress):
-    ProgressView(value: progress) {
-        Text("Downloading model...")
-    }
+// Check if model is not ready
+let systemModel = SystemLanguageModel.default
+if case .unavailable(.modelNotReady) = systemModel.availability {
+    // Show loading UI
+    ContentUnavailableView(
+        "Model Downloading",
+        systemImage: "arrow.down.circle",
+        description: Text("The model is being downloaded. Please try again later.")
+    )
+}
 ```
 
 ## Internationalization
 
-Foundation Models has built-in i18n support:
+Foundation Models has built-in language/locale support:
 
 ```swift
-// Automatically adapts to locale
-let englishSession = ChatSession(locale: Locale(identifier: "en"))
-let spanishSession = ChatSession(locale: Locale(identifier: "es"))
-let japaneseSession = ChatSession(locale: Locale(identifier: "ja"))
+let model = SystemLanguageModel.default
+let locale = Locale.current
+
+guard model.supportsLocale(locale) else {
+    // Provide a fallback UI or message
+    return
+}
+
+// For best results outside U.S. English, include locale instructions.
+let instructions = "The person's locale is \(locale.identifier)."
+let session = LanguageModelSession(instructions: instructions)
 ```
 
-**Supported languages:**
-
-Check Apple's documentation for current language support. Major languages are typically supported.
+Check Apple's documentation for current language support and handle unsupported locales by catching `LanguageModelSession.GenerationError.unsupportedLanguageOrLocale(_:)`.
 
 ## Next Steps
 

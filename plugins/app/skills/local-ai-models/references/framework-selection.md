@@ -9,16 +9,17 @@ Apple's official framework for on-device AI with simplified APIs.
 ### Use Foundation Models When:
 
 - Building standard chat interfaces
-- Need built-in internationalization
-- Want simplified API with ChatSession
+- Need guided generation or tool calling with the system model
+- Need built-in internationalization with language/locale checks
+- Want simplified API with LanguageModelSession
 - Prioritize ease of implementation
-- Using pre-trained models from Apple's registry
+- Using the system on-device model provided by Apple
 
 ### Advantages:
 
 - Optimized for Apple Silicon
-- Simplified API with automatic session management
-- Built-in internationalization support
+- Simplified API with LanguageModelSession
+- Built-in language/locale support via supportsLocale(_:)
 - Official Apple framework with guaranteed support
 - Automatic model downloading and availability checking
 
@@ -33,11 +34,11 @@ Apple's official framework for on-device AI with simplified APIs.
 import FoundationModels
 
 // Simple initialization
-let availability = await ChatSession.availability
-guard availability == .available else { return }
+let model = SystemLanguageModel.default
+guard model.isAvailable else { return }
 
-let session = ChatSession(locale: Locale.current)
-for try await chunk in session.send("Hello") {
+let session = LanguageModelSession()
+for try await chunk in session.streamResponse(to: "Hello") {
     print(chunk)
 }
 ```
@@ -48,7 +49,7 @@ Community-driven framework with more control and advanced features.
 
 ### Use MLX Swift When:
 
-- Need tool/function calling capabilities
+- Need tool calling with custom models or non-text modalities
 - Working with Vision Language Models (VLMs)
 - Implementing image generation
 - Using custom models beyond Apple's registry
@@ -93,10 +94,10 @@ let model = try await LLMModelFactory.shared.loadContainer(
 | -------------------- | ----------------- | ---------- |
 | Ease of Use          | ⭐⭐⭐⭐⭐        | ⭐⭐⭐     |
 | Standard Chat        | ⭐⭐⭐⭐⭐        | ⭐⭐⭐⭐   |
-| Tool Calling         | ❌                | ⭐⭐⭐⭐⭐ |
+| Tool Calling         | ⭐⭐⭐⭐           | ⭐⭐⭐⭐⭐ |
 | Vision Models        | ❌                | ⭐⭐⭐⭐⭐ |
 | Image Generation     | ❌                | ⭐⭐⭐⭐⭐ |
-| Custom Models        | ⭐⭐              | ⭐⭐⭐⭐⭐ |
+| Custom Models        | ❌                | ⭐⭐⭐⭐⭐ |
 | Internationalization | ⭐⭐⭐⭐⭐        | ⭐⭐⭐     |
 | Documentation        | ⭐⭐⭐⭐⭐        | ⭐⭐⭐⭐   |
 | Apple Support        | ⭐⭐⭐⭐⭐        | ⭐⭐⭐     |
@@ -110,7 +111,8 @@ Standard chat interface
 └── Foundation Models ✓
 
 Tool/function calling
-└── MLX Swift ✓
+└── Foundation Models ✓ (system model)
+    MLX Swift ✓ (custom models)
 
 Vision Language Models (VLMs)
 └── MLX Swift ✓
@@ -136,7 +138,7 @@ Yes! Many apps use Foundation Models for standard chat and MLX Swift for advance
 ```swift
 // Foundation Models for chat
 class ChatService {
-    private let session = ChatSession(locale: .current)
+    private let session = LanguageModelSession()
 }
 
 // MLX Swift for vision

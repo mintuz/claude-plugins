@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Agents and skills for Swift app development on iOS.",
   "author": {
     "name": "Adam Bulmer",

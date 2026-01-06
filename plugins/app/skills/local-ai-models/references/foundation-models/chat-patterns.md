@@ -23,16 +23,17 @@ struct Message: Identifiable {
 
 @Observable
 class ChatViewModel {
-    private var session: ChatSession?
+    private var session: LanguageModelSession?
     var messages: [Message] = []
     var isLoading = false
 
     func initialize() async throws {
-        guard await ChatSession.availability == .available else {
+        let systemModel = SystemLanguageModel.default
+        guard systemModel.isAvailable else {
             throw ChatError.notAvailable
         }
 
-        session = ChatSession(locale: Locale.current)
+        session = LanguageModelSession()
     }
 
     func send(_ text: String) async throws {
@@ -48,7 +49,7 @@ class ChatViewModel {
 
         // Stream response
         var response = ""
-        for try await chunk in session.send(text) {
+        for try await chunk in session.streamResponse(to: text) {
             response += chunk
             // Update last message or add new one
             if let lastIndex = messages.indices.last,
@@ -139,22 +140,23 @@ struct MessageBubble: View {
 
 ## Pattern 2: Multi-Turn Conversations
 
-CRITICAL: Reuse ChatSession to maintain conversation context.
+CRITICAL: Reuse LanguageModelSession to maintain conversation context.
 
 ```swift
 @Observable
 class ConversationManager {
-    private var session: ChatSession?
+    private var session: LanguageModelSession?
     var messages: [Message] = []
 
     // Create session once, reuse for entire conversation
     func startConversation() async throws {
-        guard await ChatSession.availability == .available else {
+        let systemModel = SystemLanguageModel.default
+        guard systemModel.isAvailable else {
             throw ChatError.notAvailable
         }
 
         // Create once and keep for conversation
-        session = ChatSession(locale: Locale.current)
+        session = LanguageModelSession()
     }
 
     func continueConversation(_ message: String) async throws {
@@ -166,7 +168,7 @@ class ConversationManager {
 
         // Session automatically maintains context
         var response = ""
-        for try await chunk in session.send(message) {
+        for try await chunk in session.streamResponse(to: message) {
             response += chunk
         }
 
@@ -175,7 +177,7 @@ class ConversationManager {
 
     func resetConversation() async throws {
         messages.removeAll()
-        session = ChatSession(locale: Locale.current)
+        session = LanguageModelSession()
     }
 }
 ```
@@ -185,22 +187,22 @@ class ConversationManager {
 ```swift
 // ❌ DON'T: This breaks conversation context
 func send(_ text: String) async throws {
-    let session = ChatSession(locale: .current) // New session each time!
-    for try await chunk in session.send(text) {
+    let session = LanguageModelSession() // New session each time!
+    for try await chunk in session.streamResponse(to: text) {
         print(chunk)
     }
 }
 
 // ✅ DO: Reuse existing session
-private var session: ChatSession?
+private var session: LanguageModelSession?
 
 func initialize() async throws {
-    session = ChatSession(locale: .current) // Create once
+    session = LanguageModelSession() // Create once
 }
 
 func send(_ text: String) async throws {
     guard let session else { return }
-    for try await chunk in session.send(text) { // Reuse
+    for try await chunk in session.streamResponse(to: text) { // Reuse
         print(chunk)
     }
 }
@@ -213,7 +215,7 @@ Show responses as they generate for better UX.
 ```swift
 @Observable
 class StreamingChatViewModel {
-    private var session: ChatSession?
+    private var session: LanguageModelSession?
     var messages: [Message] = []
     var currentStreamingResponse = ""
     var isStreaming = false
@@ -232,7 +234,7 @@ class StreamingChatViewModel {
         }
 
         // Stream with UI updates
-        for try await chunk in session.send(text) {
+        for try await chunk in session.streamResponse(to: text) {
             currentStreamingResponse += chunk
             // SwiftUI automatically updates UI
         }
@@ -271,20 +273,34 @@ struct StreamingChatView: View {
 
 ## Pattern 4: Language Switching
 
-Handle locale changes properly.
+Handle language changes through prompts.
 
 ```swift
 @Observable
 class MultilingualChat {
-    private var session: ChatSession?
-    private var currentLocale: Locale = .current
+    private var session: LanguageModelSession?
+    private var currentLanguage: Locale = Locale.current
+
+    func initialize() async throws {
+        let systemModel = SystemLanguageModel.default
+        guard systemModel.isAvailable else {
+            throw ChatError.notAvailable
+        }
+
+        session = LanguageModelSession()
+    }
 
     func switchLanguage(to locale: Locale) async throws {
-        currentLocale = locale
+        currentLanguage = locale
 
-        // Create new session with new locale
-        // Note: This clears conversation history
-        session = ChatSession(locale: locale)
+        // Recreate the session with locale instructions for better accuracy
+        let model = SystemLanguageModel.default
+        guard model.supportsLocale(locale) else {
+            throw ChatError.notAvailable
+        }
+
+        let instructions = "The person's locale is \(locale.identifier)."
+        session = LanguageModelSession(instructions: instructions)
     }
 
     func send(_ text: String) async throws {
@@ -292,8 +308,7 @@ class MultilingualChat {
             throw ChatError.sessionNotInitialized
         }
 
-        // Session uses locale automatically
-        for try await chunk in session.send(text) {
+        for try await chunk in session.streamResponse(to: text) {
             print(chunk)
         }
     }
@@ -301,20 +316,20 @@ class MultilingualChat {
 
 struct LanguageSelectorView: View {
     @State private var chat = MultilingualChat()
-    @State private var selectedLocale = Locale.current
+    @State private var selectedLocale = Locale(identifier: "en")
 
-    let availableLocales = [
-        Locale(identifier: "en_US"),
-        Locale(identifier: "es_ES"),
-        Locale(identifier: "ja_JP"),
-        Locale(identifier: "fr_FR")
+    let availableLocales: [Locale] = [
+        Locale(identifier: "en"),
+        Locale(identifier: "es"),
+        Locale(identifier: "ja"),
+        Locale(identifier: "fr")
     ]
 
     var body: some View {
         VStack {
             Picker("Language", selection: $selectedLocale) {
                 ForEach(availableLocales, id: \.identifier) { locale in
-                    Text(locale.localizedString(forIdentifier: locale.identifier) ?? "")
+                    Text(locale.localizedString(forIdentifier: locale.identifier) ?? locale.identifier)
                         .tag(locale)
                 }
             }
@@ -327,6 +342,9 @@ struct LanguageSelectorView: View {
 
             ChatInterface(chat: chat)
         }
+        .task {
+            try? await chat.initialize()
+        }
     }
 }
 ```
@@ -338,7 +356,7 @@ Allow users to stop generation.
 ```swift
 @Observable
 class CancellableChatViewModel {
-    private var session: ChatSession?
+    private var session: LanguageModelSession?
     private var currentTask: Task<Void, Error>?
     var messages: [Message] = []
     var isGenerating = false
@@ -353,8 +371,7 @@ class CancellableChatViewModel {
             defer { isGenerating = false }
 
             var response = ""
-
-            for try await chunk in session.send(text) {
+            for try await chunk in session.streamResponse(to: text) {
                 // Check for cancellation
                 try Task.checkCancellation()
 
@@ -396,17 +413,18 @@ Save and restore conversations.
 ```swift
 @Observable
 class PersistentChatViewModel {
-    private var session: ChatSession?
+    private var session: LanguageModelSession?
     var messages: [Message] = []
 
     private let conversationKey = "saved_conversation"
 
     func initialize() async throws {
-        guard await ChatSession.availability == .available else {
+        let systemModel = SystemLanguageModel.default
+        guard systemModel.isAvailable else {
             throw ChatError.notAvailable
         }
 
-        session = ChatSession(locale: Locale.current)
+        session = LanguageModelSession()
 
         // Load saved messages
         loadConversation()
@@ -418,7 +436,7 @@ class PersistentChatViewModel {
         messages.append(Message(role: .user, content: text))
 
         var response = ""
-        for try await chunk in session.send(text) {
+        for try await chunk in session.streamResponse(to: text) {
             response += chunk
         }
 
@@ -461,19 +479,18 @@ extension Message: Codable {
 
 ### DO:
 
-- ✅ Reuse ChatSession for multi-turn conversations
-- ✅ Stream responses for better UX
-- ✅ Check availability before initialization
-- ✅ Handle all availability states in UI
-- ✅ Use locale parameter for internationalization
+- ✅ Reuse LanguageModelSession for multi-turn conversations
+- ✅ Stream responses for better UX using `streamResponse(to:)`
+- ✅ Check availability before initialization with `SystemLanguageModel.default.isAvailable`
+- ✅ Handle all availability states in UI (`.available`, `.unavailable(.modelNotReady)`, etc.)
+- ✅ Use string prompts (or PromptBuilder for advanced prompt composition)
 - ✅ Allow users to cancel long generations
 
 ### DON'T:
 
 - ❌ Create new session for each message
 - ❌ Block UI waiting for responses
-- ❌ Ignore downloading state
-- ❌ Mix languages without session context
+- ❌ Use deprecated `ChatSession` API
 - ❌ Forget to handle errors
 
 ## Next Steps
