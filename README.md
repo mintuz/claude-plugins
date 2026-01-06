@@ -34,13 +34,14 @@ Custom agents, skills, and commands for software development workflows.
 
 ### Core
 
-| Skill             | Description                                                              |
-| ----------------- | ------------------------------------------------------------------------ |
-| `commit-messages` | Conventional commit messages that explain the "why" not just the "what"  |
-| `expectations`    | Working expectations and documentation practices                         |
-| `learn`           | Document learnings and capture insights into CLAUDE.md                   |
-| `pr`              | PR descriptions, sizing, and creation with gh CLI                        |
-| `writing`         | Developer-focused writing: tutorials, how-tos, docs with clear structure |
+| Skill             | Description                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| `commit-messages` | Conventional commit messages that explain the "why" not just the "what"                      |
+| `expectations`    | Working expectations and documentation practices                                             |
+| `learn`           | Document learnings and capture insights into CLAUDE.md                                       |
+| `pr`              | PR descriptions, sizing, and creation with gh CLI                                            |
+| `writing`         | Developer-focused writing: tutorials, how-tos, docs with clear structure                     |
+| `prompt-master`   | Transform simple prompts into comprehensive, XML-tagged instructions with roles and examples |
 
 ### Web
 
@@ -59,18 +60,19 @@ Custom agents, skills, and commands for software development workflows.
 
 ### App
 
-| Skill                           | Description                                                                   |
-| ------------------------------- | ----------------------------------------------------------------------------- |
-| `swift-testing`                 | Swift Testing framework: @Test macros, #expect/#require patterns              |
-| `app-intent-driven-development` | Build features as App Intents first for Siri, Shortcuts, widgets, and SwiftUI |
-| `swiftui-architecture`          | Modern SwiftUI patterns: @Observable, state management, no ViewModels         |
-| `debug`                         | Structured feedback loop for debugging iOS simulator issues and UI problems   |
+| Skill                           | Description                                                                                     |
+| ------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `swift-testing`                 | Swift Testing framework: @Test macros, #expect/#require patterns                                |
+| `app-intent-driven-development` | Build features as App Intents first for Siri, Shortcuts, widgets, and SwiftUI                   |
+| `swiftui-architecture`          | Modern SwiftUI patterns: @Observable, state management, no ViewModels                           |
+| `debug`                         | Structured feedback loop for debugging iOS simulator issues and UI problems                     |
+| `local-ai-models`               | On-device AI with Foundation Models and MLX Swift: LLMs, VLMs, embeddings, and image generation |
 
 ### TypeScript
 
-| Skill                       | Description                                                           |
-| --------------------------- | --------------------------------------------------------------------- |
-| `typescript-best-practices` | Schema-first development, strict typing, functional patterns, and Zod |
+| Skill        | Description                                                           |
+| ------------ | --------------------------------------------------------------------- |
+| `typescript` | Schema-first development, strict typing, functional patterns, and Zod |
 
 ### Life
 
@@ -139,6 +141,30 @@ go run scripts/package-skills.go
 4. Access the skills in your web conversations
 
 See [scripts/README.md](scripts/README.md) for more options including custom output directories and skill name prefixing.
+
+### Syncing to Codex CLI
+
+Skills can also be synced to the OpenAI Codex CLI format, making them available for use with Codex.
+
+Run the sync script from the repository root:
+
+```bash
+# Sync all skills to ~/.codex/skills (user-level)
+go run scripts/codex-sync.go
+
+# Sync to .codex/skills in current project (project-level)
+go run scripts/codex-sync.go --project
+
+# This syncs skills like:
+# commit-messages
+# react
+# swift-testing
+# etc.
+```
+
+After syncing, invoke skills in Codex CLI using the `$skill-name` syntax (e.g., `$commit-messages`, `$react`).
+
+See [scripts/README.md](scripts/README.md) for more options including custom output directories, skill name prefixing, and dry-run mode.
 
 ## Credits
 
