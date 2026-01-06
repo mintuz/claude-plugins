@@ -50,29 +50,28 @@ app/
 **Vite configuration:**
 
 ```typescript
-
 function privateNetworkAccess(): Plugin {
   return {
-    name: 'private-network-access',
+    name: "private-network-access",
     configureServer(server) {
       server.middlewares.use((_req, res, next) => {
-        res.setHeader('Access-Control-Allow-Origin', '*')
-        res.setHeader('Access-Control-Allow-Private-Network', 'true')
-        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
-        res.setHeader('Access-Control-Allow-Headers', '*')
-        next()
-      })
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Private-Network", "true");
+        res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "*");
+        next();
+      });
     },
     configurePreviewServer(server) {
       server.middlewares.use((_req, res, next) => {
-        res.setHeader('Access-Control-Allow-Origin', '*')
-        res.setHeader('Access-Control-Allow-Private-Network', 'true')
-        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
-        res.setHeader('Access-Control-Allow-Headers', '*')
-        next()
-      })
-    }
-  }
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Private-Network", "true");
+        res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "*");
+        next();
+      });
+    },
+  };
 }
 
 // vite.config.ts

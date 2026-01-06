@@ -55,7 +55,7 @@
 const [uiState, setUiState] = useWidgetState({
   selectedTaskId: 2,
   sortBy: "status",
-  expandedSections: ["completed"]
+  expandedSections: ["completed"],
 });
 ```
 
@@ -127,13 +127,13 @@ async function handleToggleTask(taskId) {
 ```typescript
 function TaskList() {
   // Server data (from tool response)
-  const toolOutput = useOpenAiGlobal('toolOutput');
+  const toolOutput = useOpenAiGlobal("toolOutput");
   const tasks = toolOutput?.tasks ?? [];
 
   // UI state (persisted)
   const [uiState, setUiState] = useWidgetState({
     selectedId: null,
-    sortBy: 'status'
+    sortBy: "status",
   });
 
   // Derived state

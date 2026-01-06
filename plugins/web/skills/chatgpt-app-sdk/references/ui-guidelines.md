@@ -4,18 +4,19 @@
 
 Choose the appropriate display mode based on content complexity and user workflow.
 
-| Mode              | Use When                                        | Max Actions | Scrolling |
-| ----------------- | ----------------------------------------------- | ----------- | --------- |
-| Inline Card       | Quick confirmation or small structured data     | 2           | None      |
-| Inline Carousel   | 3-8 similar items for comparison                | 1 per item  | None      |
-| Fullscreen        | Multi-step workflows or deep exploration        | Unlimited   | Yes       |
-| Picture-in-Picture | Parallel activities (games, live monitoring)    | Unlimited   | Yes       |
+| Mode               | Use When                                     | Max Actions | Scrolling |
+| ------------------ | -------------------------------------------- | ----------- | --------- |
+| Inline Card        | Quick confirmation or small structured data  | 2           | None      |
+| Inline Carousel    | 3-8 similar items for comparison             | 1 per item  | None      |
+| Fullscreen         | Multi-step workflows or deep exploration     | Unlimited   | Yes       |
+| Picture-in-Picture | Parallel activities (games, live monitoring) | Unlimited   | Yes       |
 
 ### Inline Card
 
 **Best for:** Confirmations, status updates, single records
 
 **Constraints:**
+
 - Auto-fit content (no internal scrolling)
 - Max two primary actions
 - No nested navigation or tabs
@@ -27,6 +28,7 @@ Choose the appropriate display mode based on content complexity and user workflo
 **Best for:** Browsing similar items side-by-side
 
 **Constraints:**
+
 - 3-8 items (fewer than 3: use card, more than 8: use fullscreen)
 - Images, titles, max three lines of metadata per item
 - One optional CTA per item
@@ -38,6 +40,7 @@ Choose the appropriate display mode based on content complexity and user workflo
 **Best for:** Complex workflows requiring multiple steps or deep exploration
 
 **Behavior:**
+
 - ChatGPT composer remains overlaid for continued conversation
 - Full scrolling and navigation support
 - Use when inline cards can't contain the content
@@ -49,6 +52,7 @@ Choose the appropriate display mode based on content complexity and user workflo
 **Best for:** Persistent parallel activities
 
 **Behavior:**
+
 - Stays fixed to viewport top during scroll
 - Updates dynamically based on prompts
 - Runs alongside conversation
