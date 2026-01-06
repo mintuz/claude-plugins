@@ -183,4 +183,4 @@ Cache-bust by changing URIs when making breaking changes:
 
 ### Deployment
 
-Deploy behind HTTPS (use ngrok locally) before connecting to ChatGPT
+Deploy behind HTTPS before connecting to ChatGPT. For local development, see [local-tunnel-setup.md](./local-tunnel-setup.md) to configure persistent Cloudflare Tunnels
