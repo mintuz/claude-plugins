@@ -132,6 +132,20 @@ server.registerResource(
 - Configure CORS headers to allow `https://chatgpt.com`
 - Set `WIDGET_CDN_URL=http://localhost:5173` for MCP server
 
+**Package.json local development script:**
+
+```json
+"devDependencies": {
+  "concurrently": "^9.1.2"
+}
+```
+
+```json
+"scripts": {
+  "dev:external": "concurrently \"vite build --watch\" \"vite preview --port 3001\""
+}
+```json
+
 **Production deployment:**
 
 - Build: `vite build` → generates `dist/widget.js` and `dist/widget.css`
