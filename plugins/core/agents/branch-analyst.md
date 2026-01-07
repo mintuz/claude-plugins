@@ -1,8 +1,7 @@
 ---
-name: compare-branch
+name: branch-analyst
 description: Branch comparison code review agent. Use to analyze git diffs between branches with structured findings across functionality, security, performance, and edge cases.
 tools: Read, Grep, Glob, Bash
-model: sonnet
 color: blue
 ---
 
