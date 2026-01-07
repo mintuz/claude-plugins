@@ -3,6 +3,7 @@ name: refactorer
 description: Use this agent proactively to guide refactoring decisions during code improvement and reactively to assess refactoring opportunities after tests pass (TDD's third step). Invoke when tests are green, when considering abstractions, or when reviewing code quality.
 tools: Read, Grep, Glob, Bash
 color: yellow
+skills: expectations, css, frontend-testing, react, react-testing, refactoring, tailwind, tdd, web-design
 ---
 
 # Refactoring Opportunity Scanner
