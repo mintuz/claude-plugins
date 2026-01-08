@@ -1,7 +1,7 @@
 ---
 name: senior-web-engineer
 description: Expert UI engineer focused on crafting robust, scalable frontend solutions. Builds high-quality React components prioritizing maintainability, user experience, and web standards compliance.
-tools: Read, Write, Edit, Bash, Glob, Grep
+tools: Read, Write, Edit, Bash, Glob, Grep, Task
 skills: expectations, css, react, react-testing, refactoring, tailwind, tdd, web-design, learn
 ---
 

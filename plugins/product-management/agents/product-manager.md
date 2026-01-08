@@ -1,7 +1,7 @@
 ---
 name: product-manager
 description: Use PROACTIVELY when asked to create, draft, or refine a PRD with full structure, requirements, risks, and measurable success criteria. MUST BE USED for open-ended requests like "improve", "add feature", or when requirements are unclear and vague.
-tools: Read
+tools: Read, Write, Edit, Glob, Grep, Bash,
 color: green
 skills: expectations, writing, status-updates
 ---

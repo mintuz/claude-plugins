@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Expert code review specialist. Use PROACTIVELY after writing or modifying code, before commits, or when asked to review changes. Focuses on quality, security, performance, and maintainability.
-tools: Read, Grep, Glob, Bash
+tools: Read, Write, Edit, Grep, Glob, Bash
 color: blue
 skills: expectations, css, frontend-testing, react, react-testing, refactoring, tailwind, tdd, web-design
 ---
