@@ -123,7 +123,14 @@ func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, useP
 	fmt.Printf("\n%s=== Syncing plugin: %s ===%s\n", colorBlue, plugin.Name, colorReset)
 
 	for _, skillPath := range plugin.Skills {
-		if err := syncSkill(plugin.Name, skillPath, targetDir, verbose, dryRun, usePrefix, stats); err != nil {
+		// Extract skill name from the path (e.g., "./skills/commit-messages" -> "commit-messages")
+		skillName := filepath.Base(skillPath)
+
+		// Construct the actual path by combining plugin source with skills directory
+		// e.g., "./plugins/core" + "/skills/" + "commit-messages" = "./plugins/core/skills/commit-messages"
+		actualSkillPath := filepath.Join(plugin.Source, "skills", skillName)
+
+		if err := syncSkill(plugin.Name, actualSkillPath, targetDir, verbose, dryRun, usePrefix, stats); err != nil {
 			fmt.Printf("%s[ERROR]%s Failed to sync %s: %v\n", colorRed, colorReset, skillPath, err)
 			stats.SkillsFailed++
 		} else {
@@ -133,7 +140,7 @@ func syncPlugin(plugin Plugin, targetDir string, verbose bool, dryRun bool, useP
 }
 
 func syncSkill(pluginName, skillPath, targetDir string, verbose bool, dryRun bool, usePrefix bool, stats *SyncStats) error {
-	// Extract skill name from path (e.g., "./plugins/core/skills/commit-messages" -> "commit-messages")
+	// Extract skill name from path (e.g., "./skills/commit-messages" -> "commit-messages")
 	skillName := filepath.Base(skillPath)
 
 	// Create Codex skill name (with optional plugin prefix)

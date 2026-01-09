@@ -129,7 +129,12 @@ func validatePlugin(plugin Plugin, verbose bool, usePrefix bool, stats *PackageS
 	fmt.Printf("\n%s=== Validating plugin: %s ===%s\n", colorBlue, plugin.Name, colorReset)
 
 	for _, skillPath := range plugin.Skills {
+		// Extract skill name from the path (e.g., "./skills/commit-messages" -> "commit-messages")
 		skillName := filepath.Base(skillPath)
+
+		// Construct the actual path by combining plugin source with skills directory
+		actualSkillPath := filepath.Join(plugin.Source, "skills", skillName)
+
 		var packagedName string
 		if usePrefix {
 			packagedName = fmt.Sprintf("%s-%s", plugin.Name, skillName)
@@ -137,9 +142,9 @@ func validatePlugin(plugin Plugin, verbose bool, usePrefix bool, stats *PackageS
 			packagedName = skillName
 		}
 
-		srcDir, err := filepath.Abs(skillPath)
+		srcDir, err := filepath.Abs(actualSkillPath)
 		if err != nil {
-			fmt.Printf("%s[ERROR]%s Failed to resolve %s: %v\n", colorRed, colorReset, skillPath, err)
+			fmt.Printf("%s[ERROR]%s Failed to resolve %s: %v\n", colorRed, colorReset, actualSkillPath, err)
 			stats.SkillsFailed++
 			continue
 		}
@@ -173,7 +178,13 @@ func packagePluginSkills(plugin Plugin, outputDir string, verbose bool, usePrefi
 	fmt.Printf("\n%s=== Packaging plugin: %s ===%s\n", colorBlue, plugin.Name, colorReset)
 
 	for _, skillPath := range plugin.Skills {
-		if err := packageSkillToZip(plugin.Name, skillPath, outputDir, verbose, usePrefix, stats); err != nil {
+		// Extract skill name from the path (e.g., "./skills/commit-messages" -> "commit-messages")
+		skillName := filepath.Base(skillPath)
+
+		// Construct the actual path by combining plugin source with skills directory
+		actualSkillPath := filepath.Join(plugin.Source, "skills", skillName)
+
+		if err := packageSkillToZip(plugin.Name, actualSkillPath, outputDir, verbose, usePrefix, stats); err != nil {
 			fmt.Printf("%s[ERROR]%s Failed to package %s: %v\n", colorRed, colorReset, skillPath, err)
 			stats.SkillsFailed++
 		} else {
