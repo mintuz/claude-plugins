@@ -58,7 +58,8 @@
         "./skills/swift-testing",
         "./skills/app-intent-driven-development",
         "./skills/swiftui-architecture",
-        "./skills/debug"
+        "./skills/debug",
+        "./skills/app-store-scraper"
       ]
     },
     {
