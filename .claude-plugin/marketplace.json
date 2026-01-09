@@ -11,12 +11,12 @@
       "source": "./plugins/core",
       "description": "Core Agents and skills that aid software development workflows",
       "skills": [
-        "./plugins/core/skills/commit-messages",
-        "./plugins/core/skills/expectations",
-        "./plugins/core/skills/learn",
-        "./plugins/core/skills/pr",
-        "./plugins/core/skills/writing",
-        "./plugins/core/skills/prompt-master"
+        "./skills/commit-messages",
+        "./skills/expectations",
+        "./skills/learn",
+        "./skills/pr",
+        "./skills/writing",
+        "./skills/prompt-master"
       ]
     },
     {
@@ -33,21 +33,21 @@
       "name": "product-management",
       "source": "./plugins/product-management",
       "description": "Agents and skills that are specialised in Product Management workflows",
-      "skills": ["./plugins/product-management/skills/status-updates"]
+      "skills": ["./skills/status-updates"]
     },
     {
       "name": "web",
       "source": "./plugins/web",
       "description": "Agents and skills that are specialised in building and maintaining web applications",
       "skills": [
-        "./plugins/web/skills/web-design",
-        "./plugins/web/skills/css",
-        "./plugins/web/skills/tdd",
-        "./plugins/web/skills/react",
-        "./plugins/web/skills/react-testing",
-        "./plugins/web/skills/frontend-testing",
-        "./plugins/web/skills/eyes",
-        "./plugins/web/skills/chatgpt-app-sdk"
+        "./skills/web-design",
+        "./skills/css",
+        "./skills/tdd",
+        "./skills/react",
+        "./skills/react-testing",
+        "./skills/frontend-testing",
+        "./skills/eyes",
+        "./skills/chatgpt-app-sdk"
       ]
     },
     {
@@ -55,17 +55,17 @@
       "source": "./plugins/app",
       "description": "Agents and skills for Swift app development on iOS",
       "skills": [
-        "./plugins/app/skills/swift-testing",
-        "./plugins/app/skills/app-intent-driven-development",
-        "./plugins/app/skills/swiftui-architecture",
-        "./plugins/app/skills/debug"
+        "./skills/swift-testing",
+        "./skills/app-intent-driven-development",
+        "./skills/swiftui-architecture",
+        "./skills/debug"
       ]
     },
     {
       "name": "life",
       "source": "./plugins/life",
       "description": "Agents and skills for personal life management",
-      "skills": ["./plugins/life/skills/gps-method"]
+      "skills": ["./skills/gps-method"]
     }
   ]
 }
