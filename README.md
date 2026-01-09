@@ -67,6 +67,7 @@ Custom agents, skills, and commands for software development workflows.
 | `swiftui-architecture`          | Modern SwiftUI patterns: @Observable, state management, no ViewModels                           |
 | `debug`                         | Structured feedback loop for debugging iOS simulator issues and UI problems                     |
 | `local-ai-models`               | On-device AI with Foundation Models and MLX Swift: LLMs, VLMs, embeddings, and image generation |
+| `app-store-scraper`             | Scrape iOS/macOS App Store data using iTunes/App Store APIs                                     |
 
 ### TypeScript
 
@@ -92,12 +93,15 @@ No standalone skills; see the `mermaid-generator` agent below.
 
 ## Agents
 
-| Agent               | Plugin             | Description                                                                                                             |
-| ------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| `compare-branch`    | core               | Branch comparison code review agent for structured findings across functionality, security, performance, and edge cases |
-| `refactor`          | core               | Refactoring coach to assess and guide meaningful abstractions after tests are green                                     |
-| `mermaid-generator` | system-design      | Generates Mermaid diagrams from code to visualize architecture and flows                                                |
-| `prd-creator`       | product-management | Builds complete PRDs with structure, requirements, risks, and success criteria                                          |
+| Agent                 | Plugin             | Description                                                                                          |
+| --------------------- | ------------------ | ---------------------------------------------------------------------------------------------------- |
+| `code-reviewer`       | web                | Expert code review specialist focusing on quality, security, performance, and maintainability        |
+| `refactorer`          | web                | Refactoring coach to guide code improvement decisions and assess opportunities after tests pass      |
+| `senior-web-engineer` | web                | Expert UI engineer for building robust, scalable React components with focus on standards compliance |
+| `test-runner`         | web                | Runs tests with auto-detection and returns concise pass/fail summaries                               |
+| `mermaid-generator`   | system-design      | Generates Mermaid diagrams from code to visualize architecture and flows                             |
+| `orchestrator`        | product-management | Master coordinator for complex multi-step tasks requiring delegation and architectural planning      |
+| `product-manager`     | product-management | Creates complete PRDs with structure, requirements, risks, and measurable success criteria           |
 
 ## Commands
 
